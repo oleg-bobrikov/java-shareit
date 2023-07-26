@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+
     private final Map<Integer, User> users = new HashMap<>();
     private final Map<String, User> emails = new HashMap<>();
     private int maxId;
@@ -24,5 +24,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findById(int userId) {
         return users.get(userId);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return emails.get(email);
     }
 }

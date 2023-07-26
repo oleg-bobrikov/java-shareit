@@ -7,4 +7,6 @@ import ru.practicum.shareit.user.model.User;
 public interface UserRepository {
     User create(User user);
     User findById(int userId);
+
+    User findByEmail(String email);
 }
