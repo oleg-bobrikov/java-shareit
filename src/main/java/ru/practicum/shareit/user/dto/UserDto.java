@@ -2,15 +2,15 @@ package ru.practicum.shareit.user.dto;
 
 import lombok.Builder;
 import lombok.Data;
-
-
-import javax.validation.constraints.Email;
+import ru.practicum.shareit.validator.ApacheEmail;
 
 @Data
 @Builder
 public class UserDto {
+
     private Integer id;
-    @Email(message = "invalid email address")
     private String name;
+
+    @ApacheEmail
     private String email;
 }
