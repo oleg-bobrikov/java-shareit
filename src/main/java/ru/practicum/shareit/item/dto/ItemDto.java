@@ -3,12 +3,22 @@ package ru.practicum.shareit.item.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 public class ItemDto {
-    private int id;
+    private Integer id;
+
+    @NotEmpty
     private String name;
+
+    @NotEmpty
     private String description;
-    private boolean isAvailable;
-    private Integer requestId;
+
+    @NotNull
+    private Boolean available;
+
+    private Integer ownerId;
 }

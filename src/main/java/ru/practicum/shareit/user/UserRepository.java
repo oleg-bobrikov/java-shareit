@@ -10,12 +10,13 @@ import java.util.Optional;
 public interface UserRepository {
     User create(User user);
 
-    Optional<User> findUserById(int userId);
+    Optional<User> findById(int userId);
 
     boolean hasEmail(String email);
 
     User update(User user);
 
-    void deleteUserById(Integer userId);
-    List<User> getUsers();
+    void deleteById(Integer userId);
+
+    List<User> getAll();
 }

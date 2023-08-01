@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -21,14 +22,14 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateEmailException("email " + userDto.getEmail() + " has already assigned.");
         }
 
-        User user = userRepository.create(UserMapper.toUser(userDto));
-        return UserMapper.toUserDto(user);
+        User user = userRepository.create(userMapper.toModel(userDto));
+        return userMapper.toDto(user);
     }
 
     @Override
     public UserDto patchUser(UserDto userDto) {
 
-        User user = userRepository.findUserById(userDto.getId()).orElseThrow(
+        User user = userRepository.findById(userDto.getId()).orElseThrow(
                 () -> new NotFoundException("user with id " + userDto.getId() + " is not exist"));
 
         boolean hasChanged = false;
@@ -47,26 +48,26 @@ public class UserServiceImpl implements UserService {
             hasChanged = true;
         }
 
-        return UserMapper.toUserDto(hasChanged ? userRepository.update(user) : user);
+        return userMapper.toDto(hasChanged ? userRepository.update(user) : user);
     }
 
     @Override
     public UserDto getUserById(Integer id) {
-        User user = userRepository.findUserById(id).orElseThrow(
+        User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("user with id " + id + " is not exist"));
-        return UserMapper.toUserDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override
     public void delete(Integer userId) {
-        userRepository.deleteUserById(userId);
+        userRepository.deleteById(userId);
     }
 
     @Override
     public List<UserDto> getUsers() {
-        return userRepository.getUsers()
+        return userRepository.getAll()
                 .stream()
-                .map(UserMapper::toUserDto)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
 }

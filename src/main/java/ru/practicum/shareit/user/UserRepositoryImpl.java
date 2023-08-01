@@ -15,25 +15,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User create(User user) {
         user.setId(++maxId);
-        users.put(user.getId(), user);
+        users.put(user.getId(), user.toBuilder().build()); //protect
         emails.add(user.getEmail());
         return user;
     }
 
     @Override
-    public Optional<User> findUserById(int userId) {
+    public Optional<User> findById(int userId) {
         User user = users.get(userId);
-        if (user == null) {
-            return Optional.empty();
-        } else {
-            // return copy of model
-            return Optional.of(
-                    User.builder()
-                            .id(user.getId())
-                            .name(user.getName())
-                            .email(user.getEmail())
-                            .build());
-        }
+        // it is necessary to protect the object from changes that's why we return a copy of object
+        return user == null ? Optional.empty() : Optional.of(user.toBuilder().build());
     }
 
     @Override
@@ -45,20 +36,20 @@ public class UserRepositoryImpl implements UserRepository {
     public User update(User user) {
         String oldEmail = users.get(user.getId()).getEmail();
         emails.remove(oldEmail);
-        users.put(user.getId(), user);
+        users.put(user.getId(), user.toBuilder().build()); //protect
         emails.add(user.getEmail());
         return user;
     }
 
     @Override
-    public void deleteUserById(Integer userId) {
+    public void deleteById(Integer userId) {
         User user = users.get(userId);
         emails.remove(user.getEmail());
         users.remove(userId);
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<User> getAll() {
         return new ArrayList<>(users.values());
     }
 }
