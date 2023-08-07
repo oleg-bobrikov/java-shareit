@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItems(String text) {
-        if( text.isEmpty()){
+        if (text.isEmpty()) {
             return new ArrayList<>();
         }
         return itemRepository.searchByText(text).stream().map(itemMapper::toDto).collect(Collectors.toList());

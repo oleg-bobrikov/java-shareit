@@ -135,7 +135,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     public List<Item> searchByText(String text) {
         String searchString = text.toLowerCase().trim();
 
-        if (searchString.isEmpty()){
+        if (searchString.isEmpty()) {
             return new ArrayList<>();
         }
 

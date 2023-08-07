@@ -1,4 +1,5 @@
 package ru.practicum.shareit.handler;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 @Slf4j
-public class CustomExceptionHandler{
+public class CustomExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handle(MethodArgumentNotValidException exception) {
@@ -26,6 +27,7 @@ public class CustomExceptionHandler{
                 .message(exception.getMessage())
                 .build();
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseError handleDuplicateEmail(DuplicateEmailException exception) {

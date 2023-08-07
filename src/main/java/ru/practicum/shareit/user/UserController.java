@@ -31,9 +31,9 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto patchUser( @RequestBody UserDto userDto, @PathVariable @NotNull Integer userId) {
+    public UserDto patchUser(@RequestBody UserDto userDto, @PathVariable @NotNull Integer userId) {
         userDto.setId(userId);
-       return userService.patchUser(userDto);
+        return userService.patchUser(userDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
