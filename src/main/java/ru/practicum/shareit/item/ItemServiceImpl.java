@@ -9,6 +9,10 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
@@ -30,7 +34,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto pathItem(ItemDto itemDto) {
-        Item item = itemRepository.findByOwnerIdAndItemId(itemDto.getOwnerId(), itemDto.getId())
+        Item item = itemRepository.searchByOwnerIdAndItemId(itemDto.getOwnerId(), itemDto.getId())
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
 
         boolean hasChanged = false;
@@ -46,12 +50,32 @@ public class ItemServiceImpl implements ItemService {
             hasChanged = true;
         }
 
-        if (itemDto.getAvailable() != null && !itemDto.getAvailable().equals(item.isAvailable())) {
+        if (itemDto.getAvailable() != null && !itemDto.getAvailable().equals(item.getAvailable())) {
 
             item.setAvailable(itemDto.getAvailable());
             hasChanged = true;
         }
 
         return itemMapper.toDto(hasChanged ? itemRepository.update(item) : item);
+    }
+
+    @Override
+    public ItemDto getItem(ItemDto itemDto) {
+        Item item = itemRepository.searchByItemId(itemDto.getId())
+                .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
+        return itemMapper.toDto(item);
+    }
+
+    @Override
+    public List<ItemDto> getItems(int ownerId) {
+        return itemRepository.searchByOwnerId(ownerId).stream().map(itemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> searchItems(String text) {
+        if( text.isEmpty()){
+            return new ArrayList<>();
+        }
+        return itemRepository.searchByText(text).stream().map(itemMapper::toDto).collect(Collectors.toList());
     }
 }

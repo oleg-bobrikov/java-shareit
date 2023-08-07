@@ -59,8 +59,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Integer userId) {
-        userRepository.deleteById(userId);
+    public void deleteUser(Integer id) {
+        userRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("user with id " + id + " is not exist"));
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -70,4 +72,5 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 }

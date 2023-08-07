@@ -2,15 +2,20 @@ package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Map;
+import java.util.List;
+
 import java.util.Optional;
 
 
 public interface ItemRepository {
     Item create(Item item);
 
-    Map<Integer, Item> searchByOwnerId(int ownerId);
-    Optional<Item> findByOwnerIdAndItemId(int ownerId,  int itemId);
+    List<Item> searchByOwnerId(int ownerId);
+    Optional<Item> searchByOwnerIdAndItemId(int ownerId, int itemId);
+
+    Optional<Item> searchByItemId(int itemId);
 
     Item update(Item item);
+
+    List<Item> searchByText(String text);
 }

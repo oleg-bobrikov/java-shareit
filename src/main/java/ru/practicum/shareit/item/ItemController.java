@@ -6,6 +6,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
 
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -28,5 +30,20 @@ public class ItemController {
         return itemService.pathItem(itemDto);
     }
 
+    @GetMapping("/{itemId}")
+    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") int ownerId, @PathVariable int itemId) {
+        ItemDto itemDto = ItemDto.builder().id(itemId).ownerId(ownerId).build();
+        return itemService.getItem(itemDto);
+    }
+
+    @GetMapping
+    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") int ownerId) {
+        return itemService.getItems(ownerId);
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> searchItems(@RequestParam String text) {
+        return itemService.searchItems(text);
+    }
 
 }
