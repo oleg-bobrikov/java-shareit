@@ -4,14 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto pathItem(ItemDto itemDto) {
+    public ItemDto patchItem(ItemDto itemDto) {
         Item item = itemRepository.searchByOwnerIdAndItemId(itemDto.getOwnerId(), itemDto.getId())
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
 
@@ -68,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItems(int ownerId) {
-        return itemRepository.searchByOwnerId(ownerId).stream().map(itemMapper::toDto).collect(Collectors.toList());
+        return itemMapper.toDtoList(itemRepository.searchByOwnerId(ownerId));
     }
 
     @Override
@@ -76,6 +75,6 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchByText(text).stream().map(itemMapper::toDto).collect(Collectors.toList());
+        return itemMapper.toDtoList(itemRepository.searchByText(text));
     }
 }

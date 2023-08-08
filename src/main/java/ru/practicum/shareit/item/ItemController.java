@@ -27,7 +27,7 @@ public class ItemController {
                              @PathVariable Integer itemId) {
         itemDto.setOwnerId(ownerId);
         itemDto.setId(itemId);
-        return itemService.pathItem(itemDto);
+        return itemService.patchItem(itemDto);
     }
 
     @GetMapping("/{itemId}")

@@ -7,7 +7,7 @@ import java.util.List;
 public interface ItemService {
     ItemDto createItem(ItemDto itemDto);
 
-    ItemDto pathItem(ItemDto itemDto);
+    ItemDto patchItem(ItemDto itemDto);
 
     ItemDto getItem(ItemDto itemDto);
 
