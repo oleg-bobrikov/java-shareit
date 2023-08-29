@@ -16,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable @NotNull Integer id) {
+    public UserDto getUserById(@PathVariable @NotNull Long id) {
         return userService.getUserById(id);
     }
 
@@ -31,14 +31,14 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto patchUser(@RequestBody UserDto userDto, @PathVariable @NotNull Integer userId) {
+    public UserDto patchUser(@RequestBody UserDto userDto, @PathVariable @NotNull Long userId) {
         userDto.setId(userId);
         return userService.patchUser(userDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable @NotNull Integer userId) {
-        userService.deleteUser(userId);
+    public void delete(@PathVariable @NotNull Long userId) {
+        userService.deleteUserById(userId);
     }
 }

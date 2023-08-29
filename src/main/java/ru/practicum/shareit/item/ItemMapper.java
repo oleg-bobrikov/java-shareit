@@ -10,12 +10,13 @@ import java.util.List;
 @Mapper(imports = User.class, componentModel = "spring")
 public interface ItemMapper {
     @Mapping(target = "ownerId", expression = "java(item.getOwner().getId())")
+    @Mapping(target="available", source="item.isAvailable")
     ItemDto toDto(Item item);
 
-    @Mapping(target = "ownerId", expression = "java(item.getOwner().getId())")
-    List<ItemDto> toDtoList(List<Item> item);
+    List<ItemDto> toDtoList(List<Item> items);
 
     @Mapping(target = "owner", expression = "java(User.builder().id(itemDto.getOwnerId()).build())")
-    @Mapping(target = "request", expression = "java(null)")
+    @Mapping(target = "itemRequest", expression = "java(null)")
+    @Mapping(target="isAvailable", source="itemDto.available")
     Item toModel(ItemDto itemDto);
 }

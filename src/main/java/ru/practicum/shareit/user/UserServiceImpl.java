@@ -1,13 +1,14 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.SqlException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,12 +18,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        if (userRepository.hasEmail(userDto.getEmail())) {
-            throw new DuplicateEmailException("email " + userDto.getEmail() + " has already assigned.");
-        }
 
-        User user = userRepository.create(userMapper.toModel(userDto));
-        return userMapper.toDto(user);
+        try {
+            User user = userRepository.save(userMapper.toModel(userDto));
+            return userMapper.toDto(user);
+        } catch (DataIntegrityViolationException exception) {
+            String detailedMessage = exception.getRootCause().toString();
+            if (detailedMessage.contains("unique_email")) {
+                throw new DuplicateEmailException("email " + userDto.getEmail() + " has already assigned.");
+            } else {
+                throw new SqlException(detailedMessage);
+            }
+
+        } catch (RuntimeException exception) {
+            throw new SqlException(exception.getMessage());
+        }
     }
 
     @Override
@@ -39,7 +49,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userDto.getEmail() != null && !userDto.getEmail().equals(user.getEmail())) {
-            if (userRepository.hasEmail(userDto.getEmail())) {
+            if (!userRepository.findAllByEmail(userDto.getEmail()).isEmpty()) {
                 throw new DuplicateEmailException(" user with email " + userDto.getEmail() + " has already assigned.");
             }
 
@@ -47,18 +57,19 @@ public class UserServiceImpl implements UserService {
             hasChanged = true;
         }
 
-        return userMapper.toDto(hasChanged ? userRepository.update(user) : user);
+        return userMapper.toDto(hasChanged ? userRepository.save(user) : user);
     }
 
+
     @Override
-    public UserDto getUserById(Integer id) {
+    public UserDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("user with id " + id + " is not exist"));
         return userMapper.toDto(user);
     }
 
     @Override
-    public void deleteUser(Integer id) {
+    public void deleteUserById(Long id) {
         userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("user with id " + id + " is not exist"));
         userRepository.deleteById(id);
@@ -66,10 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsers() {
-        return userRepository.getAll()
-                .stream()
-                .map(userMapper::toDto)
-                .collect(Collectors.toList());
+        return userMapper.toDtoList(userRepository.findAll());
     }
 
 }

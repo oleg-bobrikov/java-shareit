@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository;
+    private final ru.practicum.shareit.item.ItemRepository itemRepository;
     private final ItemMapper itemMapper;
     private final UserService userService;
     private final UserMapper userMapper;
@@ -28,12 +28,13 @@ public class ItemServiceImpl implements ItemService {
         User user = userMapper.toModel(userService.getUserById(itemDto.getOwnerId()));
         Item item = itemMapper.toModel(itemDto);
         item.setOwner(user);
-        return itemMapper.toDto(itemRepository.create(itemMapper.toModel(itemDto)));
+
+        return itemMapper.toDto(itemRepository.save(itemMapper.toModel(itemDto)));
     }
 
     @Override
     public ItemDto patchItem(ItemDto itemDto) {
-        Item item = itemRepository.searchByOwnerIdAndItemId(itemDto.getOwnerId(), itemDto.getId())
+        Item item = itemRepository.findByIdAndOwnerId(itemDto.getId(), itemDto.getOwnerId())
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
 
         boolean hasChanged = false;
@@ -49,25 +50,25 @@ public class ItemServiceImpl implements ItemService {
             hasChanged = true;
         }
 
-        if (itemDto.getAvailable() != null && !itemDto.getAvailable().equals(item.getAvailable())) {
+        if (itemDto.getAvailable() != null && !itemDto.getAvailable().equals(item.getIsAvailable())) {
 
-            item.setAvailable(itemDto.getAvailable());
+            item.setIsAvailable(itemDto.getAvailable());
             hasChanged = true;
         }
 
-        return itemMapper.toDto(hasChanged ? itemRepository.update(item) : item);
+        return itemMapper.toDto(hasChanged ? itemRepository.save(item) : item);
     }
 
     @Override
     public ItemDto getItem(ItemDto itemDto) {
-        Item item = itemRepository.searchByItemId(itemDto.getId())
+        Item item = itemRepository.findById(itemDto.getId())
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
         return itemMapper.toDto(item);
     }
 
     @Override
-    public List<ItemDto> getItems(int ownerId) {
-        return itemMapper.toDtoList(itemRepository.searchByOwnerId(ownerId));
+    public List<ItemDto> getItems(Long ownerId) {
+        return itemMapper.toDtoList(itemRepository.findByOwnerId(ownerId));
     }
 
     @Override
@@ -75,6 +76,6 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        return itemMapper.toDtoList(itemRepository.searchByText(text));
+        return itemMapper.toDtoList(itemRepository.search(text));
     }
 }

@@ -11,9 +11,9 @@ public interface UserService {
 
     UserDto patchUser(UserDto userDto);
 
-    UserDto getUserById(Integer id);
+    UserDto getUserById(Long id);
 
-    void deleteUser(Integer userId);
+    void deleteUserById(Long userId);
 
     List<UserDto> getUsers();
 }

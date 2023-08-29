@@ -1,21 +1,18 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 
+import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface UserRepository {
-    User create(User user);
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findById(int userId);
+    List<User> findAllByEmail(String email);
 
-    boolean hasEmail(String email);
-
-    User update(User user);
-
-    void deleteById(Integer userId);
-
-    List<User> getAll();
+    @Query("select u from User as u where u.id = ?1")
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    Optional<User> findByIdPessimisticRead(Long userId);
 }
