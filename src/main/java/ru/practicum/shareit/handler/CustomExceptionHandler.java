@@ -91,6 +91,18 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handle(UnsupportedStateException exception) {
+        log.error(exception.getMessage(), exception);
+        return ResponseError.builder()
+                .error(exception.getMessage())
+                .status(400)
+                .exception("ru.practicum.shareit.exception.UnsupportedStatusException")
+                .message(exception.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handle(RuntimeException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()

@@ -2,38 +2,44 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ru.practicum.shareit.item.ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final BookingRepository bookingRepository;
+    private final BookingMapper bookingMapper;
 
 
     @Override
-    public ItemDto createItem(ItemDto itemDto) {
+    public ItemAnswerDto createItem(ItemPostRequestDto itemPostRequestDto) {
 
-        User user = userMapper.toModel(userService.getUserById(itemDto.getOwnerId()));
-        Item item = itemMapper.toModel(itemDto);
+        User user = userMapper.toModel(userService.getUserById(itemPostRequestDto.getOwnerId()));
+        Item item = itemMapper.toModel(itemPostRequestDto);
         item.setOwner(user);
 
-        return itemMapper.toDto(itemRepository.save(itemMapper.toModel(itemDto)));
+        return itemMapper.toDto(itemRepository.save(item));
     }
 
     @Override
-    public ItemDto patchItem(ItemDto itemDto) {
+    public ItemAnswerDto patchItem(ItemPatchRequestDto itemDto) {
         Item item = itemRepository.findByIdAndOwnerId(itemDto.getId(), itemDto.getOwnerId())
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
 
@@ -60,22 +66,47 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItem(ItemDto itemDto) {
-        Item item = itemRepository.findById(itemDto.getId())
-                .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
-        return itemMapper.toDto(item);
+    public ItemAnswerDto getItem(ItemGetRequestDto itemGetRequestDto) {
+        Item item = itemRepository.findById(itemGetRequestDto.getId())
+                .orElseThrow(() -> new NotFoundException("Item with id " + itemGetRequestDto.getId() + " is not exist"));
+
+        ItemAnswerDto itemAnswerDto = itemMapper.toDto(item);
+
+        if (item.getOwner().getId().equals(itemGetRequestDto.getUserId())) {
+
+            Booking lastBooking = bookingRepository.findLastByItemId(item.getId()).orElse(null);
+            itemAnswerDto.setLastBooking(bookingMapper.toShortDto(lastBooking));
+
+            Booking nextBooking = bookingRepository.findFutureByItemId(item.getId()).orElse(null);
+            itemAnswerDto.setNextBooking(bookingMapper.toShortDto(nextBooking));
+        }
+
+        return itemAnswerDto;
     }
 
     @Override
-    public List<ItemDto> getItems(Long ownerId) {
-        return itemMapper.toDtoList(itemRepository.findByOwnerId(ownerId));
+    public List<ItemAnswerDto> getItems(Long ownerId) {
+
+        return itemRepository.findByOwnerId(ownerId).stream().map(item -> {
+
+            ItemAnswerDto itemAnswerDto = itemMapper.toDto(item);
+            Booking lastBooking = bookingRepository.findLastByItemId(item.getId()).orElse(null);
+            itemAnswerDto.setLastBooking(bookingMapper.toShortDto(lastBooking));
+
+            Booking nextBooking = bookingRepository.findFutureByItemId(item.getId()).orElse(null);
+            itemAnswerDto.setNextBooking(bookingMapper.toShortDto(nextBooking));
+
+            return itemAnswerDto;
+
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> searchItems(String text) {
+    public List<ItemAnswerDto> searchItems(String text) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
+
         return itemMapper.toDtoList(itemRepository.search(text));
     }
 }

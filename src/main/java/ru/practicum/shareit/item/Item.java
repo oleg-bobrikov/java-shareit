@@ -27,7 +27,7 @@ public class Item {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_available")
     private Boolean isAvailable;
 
     @ManyToOne
@@ -37,4 +37,5 @@ public class Item {
     @OneToOne
     @JoinColumn(name = "request_id")
     private ItemRequest itemRequest;
+
 }

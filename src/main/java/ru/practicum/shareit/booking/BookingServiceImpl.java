@@ -14,6 +14,8 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -30,7 +32,9 @@ public class BookingServiceImpl implements BookingService {
 
         Instant start = InstantConverter.fromPattern(bookingRequestDto.getStart());
         Instant end = InstantConverter.fromPattern(bookingRequestDto.getEnd());
+
         Instant now = Instant.now();
+
         if (start.isBefore(now)) {
             throw new BusinessLogicException("start is in the past");
         }
@@ -53,12 +57,25 @@ public class BookingServiceImpl implements BookingService {
             throw new NotAvailableException("Item with id " + bookingRequestDto.getItemId() + " is not available for booking");
         }
 
+        if(item.getOwner().getId().equals(booker.getId())){
+          throw new NotFoundException("Booker and owner should be different");
+        }
+
+        // search existing bookings for the item with intersection periods having status Waiting or Approved
+        List<Booking> conflicts = bookingRepository.findIntersectionPeriods(item.getId(),
+                OffsetDateTime.ofInstant(start, ZoneId.of("UTC")),
+                OffsetDateTime.ofInstant(end, ZoneId.of("UTC")));
+
+        if (!conflicts.isEmpty()) {
+            throw new NotAvailableException("Item with id " + item.getId() + " has already booked");
+        }
+
         Booking booking = Booking.builder()
                 .item(item)
                 .booker(booker)
                 .status(Status.WAITING)
-                .start(start)
-                .end(end)
+                .start(OffsetDateTime.ofInstant(start, ZoneId.of("UTC")))
+                .end(OffsetDateTime.ofInstant(end, ZoneId.of("UTC")))
                 .build();
 
         return bookingMapper.toDto(bookingRepository.save(booking));
@@ -69,14 +86,15 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingApproveDto.getBookingId())
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingApproveDto.getBookingId() + " is not exist"));
         if (!booking.getItem().getOwner().getId().equals(bookingApproveDto.getOwnerId())) {
-            throw new BusinessLogicException("Booking with id " + bookingApproveDto.getBookingId() + " should have valid owner ID");
+            throw new NotFoundException("Booking with id " + bookingApproveDto.getBookingId() + " should have valid owner ID");
         }
-        if (booking.getStatus().equals(Status.WAITING) && bookingApproveDto.getApproved()) {
+
+        if (!booking.getStatus().equals(Status.WAITING)) {
+            throw new BusinessLogicException("Wrong operation for booking with id " + bookingApproveDto.getBookingId());
+        } else if (bookingApproveDto.getApproved()) {
             booking.setStatus(Status.APPROVED);
-        } else if (!booking.getStatus().equals(Status.APPROVED) && !bookingApproveDto.getApproved()) {
-            booking.setStatus(Status.REJECTED);
         } else {
-            return bookingMapper.toDto(booking);
+            booking.setStatus(Status.REJECTED);
         }
 
         return bookingMapper.toDto(bookingRepository.save(booking));
@@ -84,12 +102,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingAnswerDto getBooking(BookingGetDto bookingGetDto) {
+        User user = userRepository.findById(bookingGetDto.getUserId())
+                .orElseThrow(() -> new NotFoundException("User with id " + bookingGetDto.getUserId() + " is not exist"));
+
         Booking booking = bookingRepository.findById(bookingGetDto.getBookingId())
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingGetDto.getBookingId() + " is not exist"));
 
-        if (!booking.getItem().getOwner().getId().equals(bookingGetDto.getUserId()) &&
-                !booking.getBooker().getId().equals(bookingGetDto.getUserId())) {
-            throw new BusinessLogicException("User with id " + bookingGetDto.getUserId() + " is not valid.");
+        if (!booking.getItem().getOwner().getId().equals(user.getId()) &&
+                !booking.getBooker().getId().equals(user.getId())) {
+            throw new NotFoundException("User with id " + bookingGetDto.getUserId() + " is not valid.");
         }
         return bookingMapper.toDto(booking);
     }
@@ -116,17 +137,20 @@ public class BookingServiceImpl implements BookingService {
                         .findFutureByBookerIdOrderByStartDesc(bookerId));
             case WAITING:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findAllByIdAndStatusOrderByStartDesc(bookerId, Status.WAITING));
+                        .findAlByBooker_IdAndStatusOrderByStartDesc(bookerId, Status.WAITING));
             case REJECTED:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findAllByIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED));
+                        .findAlByBooker_IdAndStatusOrderByStartDesc(bookerId, Status.REJECTED));
             default:
                 throw new IllegalStateException("Unexpected value: " + state);
         }
     }
 
     @Override
+    @Transactional
     public List<BookingAnswerDto> getBookingsByOwnerId(Long ownerId, State state) {
+        userRepository.findByIdPessimisticRead(ownerId)
+                .orElseThrow(() -> new NotFoundException("Booker with id " + ownerId + " is not exist"));
         switch (state) {
             case ALL:
                 return bookingMapper.toDtoList(bookingRepository

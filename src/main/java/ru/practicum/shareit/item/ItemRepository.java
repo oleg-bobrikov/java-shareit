@@ -22,5 +22,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select i from Item as i where i.id = ?1")
     @Lock(LockModeType.PESSIMISTIC_READ)
     Optional<Item> findByIdPessimisticRead(Long itemId);
+
 }
 

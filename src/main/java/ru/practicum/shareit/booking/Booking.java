@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -24,11 +24,11 @@ public class Booking {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "start_date", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Instant start;
+    @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private OffsetDateTime start;
 
-    @Column(name = "end_date", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Instant end;
+    @Column(name = "end_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private OffsetDateTime end;
 
     @OneToOne
     @JoinColumn(name = "item_id")
