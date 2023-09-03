@@ -25,6 +25,7 @@ public class CustomExceptionHandler {
                 .message(exception.getMessage())
                 .build();
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handle(NotAvailableException exception) {
@@ -37,7 +38,6 @@ public class CustomExceptionHandler {
                 .message(exception.getMessage())
                 .build();
     }
-
 
 
     @ExceptionHandler
@@ -77,6 +77,7 @@ public class CustomExceptionHandler {
                 .message(exception.getMessage())
                 .build();
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handle(BusinessLogicException exception) {

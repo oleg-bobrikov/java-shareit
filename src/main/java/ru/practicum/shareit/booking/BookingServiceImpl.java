@@ -57,8 +57,8 @@ public class BookingServiceImpl implements BookingService {
             throw new NotAvailableException("Item with id " + bookingRequestDto.getItemId() + " is not available for booking");
         }
 
-        if(item.getOwner().getId().equals(booker.getId())){
-          throw new NotFoundException("Booker and owner should be different");
+        if (item.getOwner().getId().equals(booker.getId())) {
+            throw new NotFoundException("Booker and owner should be different");
         }
 
         // search existing bookings for the item with intersection periods having status Waiting or Approved
