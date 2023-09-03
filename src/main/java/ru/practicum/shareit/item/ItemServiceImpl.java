@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.exception.BusinessLogicException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.user.User;
@@ -26,6 +27,8 @@ public class ItemServiceImpl implements ItemService {
     private final UserMapper userMapper;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
+    private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
 
 
     @Override
@@ -72,6 +75,7 @@ public class ItemServiceImpl implements ItemService {
 
         ItemAnswerDto itemAnswerDto = itemMapper.toDto(item);
 
+        // add booking history
         if (item.getOwner().getId().equals(itemGetRequestDto.getUserId())) {
 
             Booking lastBooking = bookingRepository.findLastByItemId(item.getId()).orElse(null);
@@ -81,6 +85,9 @@ public class ItemServiceImpl implements ItemService {
             itemAnswerDto.setNextBooking(bookingMapper.toShortDto(nextBooking));
         }
 
+        // add comments
+        itemAnswerDto.setComments(commentMapper.toDtoList(commentRepository.findAllByItem_Id(item.getId())));
+
         return itemAnswerDto;
     }
 
@@ -89,12 +96,16 @@ public class ItemServiceImpl implements ItemService {
 
         return itemRepository.findByOwnerId(ownerId).stream().map(item -> {
 
+            // add booking history
             ItemAnswerDto itemAnswerDto = itemMapper.toDto(item);
             Booking lastBooking = bookingRepository.findLastByItemId(item.getId()).orElse(null);
             itemAnswerDto.setLastBooking(bookingMapper.toShortDto(lastBooking));
 
             Booking nextBooking = bookingRepository.findFutureByItemId(item.getId()).orElse(null);
             itemAnswerDto.setNextBooking(bookingMapper.toShortDto(nextBooking));
+
+            // add comments
+            itemAnswerDto.setComments(commentMapper.toDtoList(commentRepository.findAllByItem_Id(item.getId())));
 
             return itemAnswerDto;
 
@@ -108,5 +119,28 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return itemMapper.toDtoList(itemRepository.search(text));
+    }
+
+    @Override
+    public CommentAnswerDto createComment(CommentPostRequestDto commentDto) {
+
+        bookingRepository.findLastBookedByBookerIdAndItemId(commentDto.getAuthorId(),
+                commentDto.getItemId()).orElseThrow(() ->
+                new BusinessLogicException(
+                        String.format("item_id %s should be booked by user_id %s",
+                                commentDto.getItemId(), commentDto.getAuthorId())));
+
+        Item item = itemRepository.findById(commentDto.getItemId()).orElseThrow(
+                () -> new NotFoundException(
+                        String.format("item_Id %s is not found", commentDto.getItemId())));
+
+        User author = userMapper.toModel(userService.getUserById(commentDto.getAuthorId()));
+
+        Comment comment = Comment.builder()
+                .item(item)
+                .author(author)
+                .text(commentDto.getText())
+                .build();
+        return commentMapper.toDto(commentRepository.save(comment));
     }
 }

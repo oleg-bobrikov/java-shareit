@@ -12,16 +12,27 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
-            "b.start_date <= ?2 and " +
-            "b.end_date > CURRENT_TIMESTAMP " +
-            "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findCurrentByBookerIdOrderByStartDesc(Long bookerId);
+            "b.start_date <= CURRENT_TIMESTAMP and " +
+            "b.end_date > CURRENT_TIMESTAMP and " +
+            "b.status in ('APPROVED', 'REJECTED') " +
+            "order by b.start_date asc", nativeQuery = true)
+    List<Booking> findCurrentByBookerIdOrderByStartAsc(Long bookerId);
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
-            "b.end_date <= CURRENT_TIMESTAMP " +
+            "b.end_date <= CURRENT_TIMESTAMP and " +
+            "b.status = 'APPROVED' " +
             "order by b.start_date desc", nativeQuery = true)
     List<Booking> findPastByBookerIdOrderByStartDesc(Long bookerId);
+
+    @Query(value = "select * from bookings as b where " +
+            "b.booker_id = ?1 and " +
+            "b.item_id = ?2 and " +
+            "b.start_date <= CURRENT_TIMESTAMP and " +
+            "b.status = 'APPROVED' " +
+            "order by b.start_date desc " +
+            "limit 1", nativeQuery = true)
+    Optional<Booking> findLastBookedByBookerIdAndItemId(Long bookerId, Long itemId);
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
@@ -41,7 +52,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where " +
             "i.owner_id = ?1 and " +
             "b.start_date <= CURRENT_TIMESTAMP and " +
-            "b.end_date > CURRENT_TIMESTAMP " +
+            "b.end_date > CURRENT_TIMESTAMP and " +
+            "b.status in ('APPROVED', 'REJECTED') " +
             "order by b.start_date desc", nativeQuery = true)
     List<Booking> findCurrentByOwnerIdOrderByStartDesc(Long ownerId);
 
@@ -49,7 +61,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "inner join items as i on b.item_id = i.id " +
             "where " +
             "i.id = ?1 and " +
-            "b.start_date <= CURRENT_TIMESTAMP " +
+            "b.start_date <= CURRENT_TIMESTAMP and " +
+            "b.status = 'APPROVED' " +
             "order by b.start_date desc " +
             "limit 1", nativeQuery = true)
     Optional<Booking> findLastByItemId(Long itemId);
@@ -58,7 +71,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "inner join items as i on b.item_id = i.id " +
             "where " +
             "i.owner_id = ?1 and " +
-            "b.end_date <= CURRENT_TIMESTAMP " +
+            "b.end_date <= CURRENT_TIMESTAMP and " +
+            "b.status = 'APPROVED' " +
             "order by b.start_date desc", nativeQuery = true)
     List<Booking> findPastByOwnerIdOrderByStartDesc(Long ownerId);
 
@@ -74,7 +88,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "inner join items as i on b.item_id = i.id " +
             "where " +
             "i.id = ?1 and " +
-            "b.start_date > CURRENT_TIMESTAMP " +
+            "b.start_date > CURRENT_TIMESTAMP and " +
+            "b.status = 'APPROVED' " +
             "order by b.start_date asc " +
             "limit 1", nativeQuery = true)
     Optional<Booking> findFutureByItemId(Long itemId);

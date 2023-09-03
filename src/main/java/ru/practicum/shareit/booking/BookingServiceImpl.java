@@ -128,7 +128,7 @@ public class BookingServiceImpl implements BookingService {
                         .findAllByBookerIdOrderByStartDesc(bookerId));
             case CURRENT:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findCurrentByBookerIdOrderByStartDesc(bookerId));
+                        .findCurrentByBookerIdOrderByStartAsc(bookerId));
             case PAST:
                 return bookingMapper.toDtoList(bookingRepository
                         .findPastByBookerIdOrderByStartDesc(bookerId));
