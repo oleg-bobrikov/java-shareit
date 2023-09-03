@@ -21,6 +21,7 @@ public interface ItemMapper {
     @Mapping(target = "available", source = "item.isAvailable")
     @Mapping(target = "lastBooking", expression = "java(null)")
     @Mapping(target = "nextBooking", expression = "java(null)")
+    @Mapping(target = "comments", expression = "java(null)")
     ItemAnswerDto toDto(Item item);
 
     List<ItemAnswerDto> toDtoList(List<Item> items);
