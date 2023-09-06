@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class CustomExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-        public ResponseError handle(MethodArgumentNotValidException exception) {
+    public ResponseError handle(MethodArgumentNotValidException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()
                 .error("BAD REQUEST")
@@ -90,6 +90,7 @@ public class CustomExceptionHandler {
                 .message(exception.getMessage())
                 .build();
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handle(UnsupportedStatusException exception) {

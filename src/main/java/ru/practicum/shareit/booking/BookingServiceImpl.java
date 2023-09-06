@@ -111,8 +111,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingId + " is not exist"));
     }
 
-    private Item findByIdLockRead(Long itemId){
-       return itemRepository.findById(itemId)
+    private Item findByIdLockRead(Long itemId) {
+        return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
     }
 
@@ -134,7 +134,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-     public List<BookingAnswerDto> getBookingsByBookerId(Long bookerId, State state) {
+    public List<BookingAnswerDto> getBookingsByBookerId(Long bookerId, State state) {
 
         findUserByIdLockRead(bookerId);
 
