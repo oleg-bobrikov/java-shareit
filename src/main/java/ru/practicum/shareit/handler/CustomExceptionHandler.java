@@ -43,7 +43,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseError DataIntegrityViolationException(DataIntegrityViolationException exception) {
+    public ResponseError handle(DataIntegrityViolationException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()
                 .error("CONFLICT")
