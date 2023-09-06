@@ -34,10 +34,8 @@ public class BookingServiceImpl implements BookingService {
 
         validatePeriod(startDate, endDAte);
 
-        Item item = itemRepository.findById(bookingRequestDto.getItemId())
-                .orElseThrow(() -> new NotFoundException("Item with id " + bookingRequestDto.getItemId() + " is not exist"));
-
-        User booker = findUserById(bookingRequestDto.getBookerId());
+        User booker = findUserByIdLockRead(bookingRequestDto.getBookerId());
+        Item item = findByIdLockRead(bookingRequestDto.getItemId());
 
         if (!item.getIsAvailable()) {
             throw new NotAvailableException("Item with id " + bookingRequestDto.getItemId() + " is not available for booking");
@@ -103,21 +101,26 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
-    private User findUserById(long userId) {
-        return userRepository.findByIdPessimisticRead(userId)
+    private User findUserByIdLockRead(Long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " is not exist"));
     }
 
-    private Booking findBookingById(long bookingId) {
+    private Booking findBookingById(Long bookingId) {
         return bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingId + " is not exist"));
     }
 
+    private Item findByIdLockRead(Long itemId){
+       return itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
+    }
+
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public BookingAnswerDto getBooking(BookingGetDto bookingGetDto) {
 
-        User user = findUserById(bookingGetDto.getUserId());
+        User user = findUserByIdLockRead(bookingGetDto.getUserId());
 
         Booking booking = findBookingById(bookingGetDto.getBookingId());
 
@@ -131,10 +134,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
-    public List<BookingAnswerDto> getBookingsByBookerId(Long bookerId, State state) {
+     public List<BookingAnswerDto> getBookingsByBookerId(Long bookerId, State state) {
 
-        findUserById(bookerId);
+        findUserByIdLockRead(bookerId);
 
         switch (state) {
             case ALL:
@@ -161,10 +163,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingAnswerDto> getBookingsByOwnerId(Long ownerId, State state) {
 
-        findUserById(ownerId);
+        findUserByIdLockRead(ownerId);
 
         switch (state) {
             case ALL:

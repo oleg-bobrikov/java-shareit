@@ -15,7 +15,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.start_date <= CURRENT_TIMESTAMP and " +
             "b.end_date > CURRENT_TIMESTAMP and " +
             "b.status in ('APPROVED', 'REJECTED') " +
-            "order by b.start_date asc", nativeQuery = true)
+            "order by b.start_date", nativeQuery = true)
     List<Booking> findCurrentByBookerIdOrderByStartDateAsc(Long bookerId);
 
     @Query(value = "select * from bookings as b where " +
@@ -82,7 +82,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "i.owner_id = ?1 and " +
             "b.start_date > CURRENT_TIMESTAMP " +
             "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findFutureByOwnerIdOrderByStartDateDesc(Long ownerId);
+    List<Booking> findFutureByOwnerIdOrderByStartDateDesc(long ownerId);
 
     @Query(value = "select * from bookings b " +
             "inner join items as i on b.item_id = i.id " +
@@ -90,7 +90,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "i.id = ?1 and " +
             "b.start_date > CURRENT_TIMESTAMP and " +
             "b.status = 'APPROVED' " +
-            "order by b.start_date asc " +
+            "order by b.start_date " +
             "limit 1", nativeQuery = true)
     Optional<Booking> findFutureByItemId(Long itemId);
 
