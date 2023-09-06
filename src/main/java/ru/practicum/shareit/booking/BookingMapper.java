@@ -12,8 +12,8 @@ import java.util.List;
 
 @Mapper(imports = {Item.class, User.class, InstantConverter.class}, componentModel = "spring")
 public interface BookingMapper {
-    @Mapping(target = "start", expression = "java(InstantConverter.toPattern(booking.getStart().toInstant()))")
-    @Mapping(target = "end", expression = "java(InstantConverter.toPattern(booking.getEnd().toInstant()))")
+    @Mapping(target = "start", expression = "java(InstantConverter.toPattern(booking.getStartDate().toInstant()))")
+    @Mapping(target = "end", expression = "java(InstantConverter.toPattern(booking.getEndDate().toInstant()))")
     BookingAnswerDto toDto(Booking booking);
 
     @Mapping(target = "bookerId", expression = "java(booking.getBooker().getId())")

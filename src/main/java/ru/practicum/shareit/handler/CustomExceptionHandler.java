@@ -1,6 +1,7 @@
 package ru.practicum.shareit.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class CustomExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseError handle(MethodArgumentNotValidException exception) {
+        public ResponseError handle(MethodArgumentNotValidException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()
                 .error("BAD REQUEST")
@@ -42,29 +43,17 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseError handleDuplicateEmail(DuplicateEmailException exception) {
+    public ResponseError DataIntegrityViolationException(DataIntegrityViolationException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()
                 .error("CONFLICT")
                 .timestamp(LocalDateTime.now())
                 .status(409)
-                .exception("ru.practicum.shareit.exception.DuplicateEmailException")
+                .exception("org.springframework.dao.DataIntegrityViolationException")
                 .message(exception.getMessage())
                 .build();
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseError handleSqlException(SqlException exception) {
-        log.error(exception.getMessage(), exception);
-        return ResponseError.builder()
-                .error("could not execute statement")
-                .timestamp(LocalDateTime.now())
-                .status(409)
-                .exception("ru.practicum.shareit.exception.SqlException")
-                .message(exception.getMessage())
-                .build();
-    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -80,12 +69,12 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseError handle(BusinessLogicException exception) {
+    public ResponseError handle(PeriodValidationException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()
                 .error("BAD REQUEST")
                 .status(400)
-                .exception("ru.practicum.shareit.exception.BusinessLogicException")
+                .exception("ru.practicum.shareit.exception.PeriodValidationException")
                 .message(exception.getMessage())
                 .build();
     }
@@ -97,10 +86,22 @@ public class CustomExceptionHandler {
         return ResponseError.builder()
                 .error(exception.getMessage())
                 .status(400)
+                .exception("ru.practicum.shareit.exception.UnsupportedStateException")
+                .message(exception.getMessage())
+                .build();
+    }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handle(UnsupportedStatusException exception) {
+        log.error(exception.getMessage(), exception);
+        return ResponseError.builder()
+                .error(exception.getMessage())
+                .status(400)
                 .exception("ru.practicum.shareit.exception.UnsupportedStatusException")
                 .message(exception.getMessage())
                 .build();
     }
+
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

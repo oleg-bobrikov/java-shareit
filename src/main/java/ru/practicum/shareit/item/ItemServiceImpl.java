@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.exception.BusinessLogicException;
+import ru.practicum.shareit.exception.NotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.user.User;
@@ -69,14 +69,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemAnswerDto getItem(ItemGetRequestDto itemGetRequestDto) {
-        Item item = itemRepository.findById(itemGetRequestDto.getId())
-                .orElseThrow(() -> new NotFoundException("Item with id " + itemGetRequestDto.getId() + " is not exist"));
+    public ItemAnswerDto getItem(long itemId,long userId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
 
         ItemAnswerDto itemAnswerDto = itemMapper.toDto(item);
 
         // add booking history
-        if (item.getOwner().getId().equals(itemGetRequestDto.getUserId())) {
+        if (item.getOwner().getId().equals(userId)) {
 
             Booking lastBooking = bookingRepository.findLastByItemId(item.getId()).orElse(null);
             itemAnswerDto.setLastBooking(bookingMapper.toShortDto(lastBooking));
@@ -86,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         // add comments
-        itemAnswerDto.setComments(commentMapper.toDtoList(commentRepository.findAllByItem_Id(item.getId())));
+        itemAnswerDto.setComments(commentMapper.toDtoList(commentRepository.findAllByItemId(item.getId())));
 
         return itemAnswerDto;
     }
@@ -105,7 +105,7 @@ public class ItemServiceImpl implements ItemService {
             itemAnswerDto.setNextBooking(bookingMapper.toShortDto(nextBooking));
 
             // add comments
-            itemAnswerDto.setComments(commentMapper.toDtoList(commentRepository.findAllByItem_Id(item.getId())));
+            itemAnswerDto.setComments(commentMapper.toDtoList(commentRepository.findAllByItemId(item.getId())));
 
             return itemAnswerDto;
 
@@ -126,7 +126,7 @@ public class ItemServiceImpl implements ItemService {
 
         bookingRepository.findLastBookedByBookerIdAndItemId(commentDto.getAuthorId(),
                 commentDto.getItemId()).orElseThrow(() ->
-                new BusinessLogicException(
+                new NotAvailableException(
                         String.format("item_id %s should be booked by user_id %s",
                                 commentDto.getItemId(), commentDto.getAuthorId())));
 

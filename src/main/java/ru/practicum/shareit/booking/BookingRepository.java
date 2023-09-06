@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findAllByBookerIdOrderByStartDateDesc(Long bookerId);
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
@@ -16,14 +16,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.end_date > CURRENT_TIMESTAMP and " +
             "b.status in ('APPROVED', 'REJECTED') " +
             "order by b.start_date asc", nativeQuery = true)
-    List<Booking> findCurrentByBookerIdOrderByStartAsc(Long bookerId);
+    List<Booking> findCurrentByBookerIdOrderByStartDateAsc(Long bookerId);
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
             "b.end_date <= CURRENT_TIMESTAMP and " +
             "b.status = 'APPROVED' " +
             "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findPastByBookerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findPastByBookerIdOrderByStartDateDesc(Long bookerId);
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
@@ -38,14 +38,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.booker_id = ?1 and " +
             "b.start_date > CURRENT_TIMESTAMP " +
             "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findFutureByBookerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findFutureByBookerIdOrderByStartDateDesc(Long bookerId);
 
-    List<Booking> findAlByBooker_IdAndStatusOrderByStartDesc(Long bookerId, Status status);
+    List<Booking> findAlByBooker_IdAndStatusOrderByStartDateDesc(Long bookerId, Status status);
 
     @Query("select b from Booking as b inner join Item as i  on b.item = i where " +
             "i.owner.id = ?1 " +
-            "order by b.start desc")
-    List<Booking> findAllByOwnerIdOrderByStartDesc(Long ownerId);
+            "order by b.startDate desc")
+    List<Booking> findAllByOwnerIdOrderByStartDateDesc(Long ownerId);
 
     @Query(value = "select * from bookings as b " +
             "inner join items as i on b.item_id = i.id " +
@@ -55,7 +55,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.end_date > CURRENT_TIMESTAMP and " +
             "b.status in ('APPROVED', 'REJECTED') " +
             "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findCurrentByOwnerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findCurrentByOwnerIdOrderByStartDateDesc(Long ownerId);
 
     @Query(value = "select * from bookings as b " +
             "inner join items as i on b.item_id = i.id " +
@@ -74,7 +74,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.end_date <= CURRENT_TIMESTAMP and " +
             "b.status = 'APPROVED' " +
             "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findPastByOwnerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findPastByOwnerIdOrderByStartDateDesc(Long ownerId);
 
     @Query(value = "select * from bookings as b " +
             "inner join items as i on b.item_id = i.id " +
@@ -82,7 +82,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "i.owner_id = ?1 and " +
             "b.start_date > CURRENT_TIMESTAMP " +
             "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findFutureByOwnerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findFutureByOwnerIdOrderByStartDateDesc(Long ownerId);
 
     @Query(value = "select * from bookings b " +
             "inner join items as i on b.item_id = i.id " +
@@ -104,6 +104,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     List<Booking> findIntersectionPeriods(Long itemId, OffsetDateTime start, OffsetDateTime end);
 
-    List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDesc(Long ownerId, Status status);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDateDesc(Long ownerId, Status status);
 
 }

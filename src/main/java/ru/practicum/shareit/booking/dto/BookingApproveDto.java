@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class BookingApproveDto {
-    Long ownerId;
-    Long bookingId;
-    Boolean approved;
+    private Long ownerId;
+    private Long bookingId;
+    private Boolean approved;
 }

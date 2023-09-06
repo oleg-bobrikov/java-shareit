@@ -1,11 +1,10 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.SqlException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
@@ -18,21 +17,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-
-        try {
-            User user = userRepository.save(userMapper.toModel(userDto));
-            return userMapper.toDto(user);
-        } catch (DataIntegrityViolationException exception) {
-            String detailedMessage = exception.getRootCause().toString();
-            if (detailedMessage.contains("unique_email")) {
-                throw new DuplicateEmailException("email " + userDto.getEmail() + " has already assigned.");
-            } else {
-                throw new SqlException(detailedMessage);
-            }
-
-        } catch (RuntimeException exception) {
-            throw new SqlException(exception.getMessage());
-        }
+            return userMapper.toDto(userRepository.save(userMapper.toModel(userDto)));
     }
 
     @Override
@@ -50,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
         if (userDto.getEmail() != null && !userDto.getEmail().equals(user.getEmail())) {
             if (!userRepository.findAllByEmail(userDto.getEmail()).isEmpty()) {
-                throw new DuplicateEmailException(" user with email " + userDto.getEmail() + " has already assigned.");
+                throw new DataIntegrityViolationException(" user with email " + userDto.getEmail() + " has already assigned.");
             }
 
             user.setEmail(userDto.getEmail());

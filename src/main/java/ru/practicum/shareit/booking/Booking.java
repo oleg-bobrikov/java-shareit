@@ -24,10 +24,10 @@ public class Booking {
     private Long id;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    private OffsetDateTime start;
+    private OffsetDateTime startDate;
 
     @Column(name = "end_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    private OffsetDateTime end;
+    private OffsetDateTime endDate;
 
     @OneToOne
     @JoinColumn(name = "item_id")

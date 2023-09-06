@@ -7,6 +7,6 @@ import ru.practicum.shareit.booking.State;
 @Data
 @Builder
 public class BookingGetByStateDto {
-    Long bookerId;
-    State state;
+   private Long bookerId;
+    private State state;
 }
