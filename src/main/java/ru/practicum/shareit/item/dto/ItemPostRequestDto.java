@@ -8,9 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-public class ItemDto {
-    private Integer id;
-
+public class ItemPostRequestDto {
     @NotEmpty
     private String name;
 
@@ -20,5 +18,5 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
-    private Integer ownerId;
+    private Long ownerId;
 }

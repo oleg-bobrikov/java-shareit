@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.itemrequest.dto;
 
 import lombok.Data;
 import ru.practicum.shareit.user.User;

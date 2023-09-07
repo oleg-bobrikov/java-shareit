@@ -8,7 +8,7 @@ import ru.practicum.shareit.validator.ApacheEmail;
 @Builder
 public class UserDto {
 
-    private Integer id;
+    private Long id;
     private String name;
 
     @ApacheEmail

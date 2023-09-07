@@ -1,13 +1,14 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.DuplicateEmailException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,19 +18,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        if (userRepository.hasEmail(userDto.getEmail())) {
-            throw new DuplicateEmailException("email " + userDto.getEmail() + " has already assigned.");
-        }
-
-        User user = userRepository.create(userMapper.toModel(userDto));
-        return userMapper.toDto(user);
+            return userMapper.toDto(userRepository.save(userMapper.toModel(userDto)));
     }
 
     @Override
+    @Transactional
     public UserDto patchUser(UserDto userDto) {
 
-        User user = userRepository.findById(userDto.getId()).orElseThrow(
-                () -> new NotFoundException("user with id " + userDto.getId() + " is not exist"));
+        User user = userMapper.toModel(getUserById(userDto.getId()));
 
         boolean hasChanged = false;
 
@@ -39,37 +35,35 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userDto.getEmail() != null && !userDto.getEmail().equals(user.getEmail())) {
-            if (userRepository.hasEmail(userDto.getEmail())) {
-                throw new DuplicateEmailException(" user with email " + userDto.getEmail() + " has already assigned.");
+            if (!userRepository.findAllByEmail(userDto.getEmail()).isEmpty()) {
+                throw new DataIntegrityViolationException(" user with email " + userDto.getEmail() + " has already assigned.");
             }
 
             user.setEmail(userDto.getEmail());
             hasChanged = true;
         }
 
-        return userMapper.toDto(hasChanged ? userRepository.update(user) : user);
+        return userMapper.toDto(hasChanged ? userRepository.save(user) : user);
     }
 
+
     @Override
-    public UserDto getUserById(Integer id) {
+    public UserDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("user with id " + id + " is not exist"));
         return userMapper.toDto(user);
     }
 
     @Override
-    public void deleteUser(Integer id) {
-        userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("user with id " + id + " is not exist"));
+    public void deleteUserById(Long id) {
+        getUserById(id);
+
         userRepository.deleteById(id);
     }
 
     @Override
     public List<UserDto> getUsers() {
-        return userRepository.getAll()
-                .stream()
-                .map(userMapper::toDto)
-                .collect(Collectors.toList());
+        return userMapper.toDtoList(userRepository.findAll());
     }
 
 }
