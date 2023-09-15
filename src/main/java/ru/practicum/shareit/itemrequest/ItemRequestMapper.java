@@ -26,7 +26,4 @@ public interface ItemRequestMapper {
     @Mapping(target = "created", expression = "java(InstantConverter.toPattern(request.getCreatedDate().toInstant()))")
     @Mapping(target = "items", expression = "java(new ArrayList<ItemShortAnswerDto>())")
     AnswerDto toShortDto(ItemRequest request);
-
-    List<AnswerDto> toShortDto(List<ItemRequest> requests);
-
 }

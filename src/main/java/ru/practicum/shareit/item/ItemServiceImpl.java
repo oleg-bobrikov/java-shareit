@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.itemrequest.ItemRequest;
 import ru.practicum.shareit.itemrequest.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
@@ -16,9 +15,7 @@ import ru.practicum.shareit.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +31,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
-
     @Override
     public ItemAnswerDto createItem(ItemPostRequestDto itemPostRequestDto) {
 
@@ -44,11 +40,10 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemMapper.toModel(itemPostRequestDto);
         item.setOwner(user);
 
-        if (requestId != null){
+        if (requestId != null) {
             item.setItemRequest(itemRequestRepository.findById(requestId)
                     .orElseThrow(() -> new NotFoundException("Item request with id " + requestId + " is not found")));
         }
-
 
         return itemMapper.toDto(itemRepository.save(item));
     }
