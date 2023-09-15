@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -8,22 +9,23 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBookerIdOrderByStartDateDesc(Long bookerId);
+    List<Booking> findAllByBookerIdOrderByStartDateDesc(Long bookerId, Pageable page);
 
-    @Query(value = "select * from bookings as b where " +
-            "b.booker_id = ?1 and " +
-            "b.start_date <= CURRENT_TIMESTAMP and " +
-            "b.end_date > CURRENT_TIMESTAMP and " +
-            "b.status in ('APPROVED', 'REJECTED') " +
-            "order by b.start_date", nativeQuery = true)
-    List<Booking> findCurrentByBookerIdOrderByStartDateAsc(Long bookerId);
+    @Query("select b from Booking b where " +
+            "b.booker.id = ?1 and " +
+            "b.startDate <= CURRENT_TIMESTAMP and " +
+            "b.endDate > CURRENT_TIMESTAMP and " +
+            "b.status in (ru.practicum.shareit.booking.Status.APPROVED, " +
+            "             ru.practicum.shareit.booking.Status.REJECTED) " +
+            "order by b.startDate")
+    List<Booking> findCurrentByBookerIdOrderByStartDateAsc(Long bookerId, Pageable page);
 
-    @Query(value = "select * from bookings as b where " +
-            "b.booker_id = ?1 and " +
-            "b.end_date <= CURRENT_TIMESTAMP and " +
-            "b.status = 'APPROVED' " +
-            "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findPastByBookerIdOrderByStartDateDesc(Long bookerId);
+    @Query("select b from Booking b where " +
+            "b.booker.id = ?1 and " +
+            "b.endDate <= CURRENT_TIMESTAMP and " +
+            "b.status = ru.practicum.shareit.booking.Status.APPROVED " +
+            "order by b.startDate desc")
+    List<Booking> findPastByBookerIdOrderByStartDateDesc(Long bookerId, Pageable page);
 
     @Query(value = "select * from bookings as b where " +
             "b.booker_id = ?1 and " +
@@ -34,28 +36,31 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "limit 1", nativeQuery = true)
     Optional<Booking> findLastBookedByBookerIdAndItemId(Long bookerId, Long itemId);
 
-    @Query(value = "select * from bookings as b where " +
-            "b.booker_id = ?1 and " +
-            "b.start_date > CURRENT_TIMESTAMP " +
-            "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findFutureByBookerIdOrderByStartDateDesc(Long bookerId);
+    @Query("select b from Booking b where " +
+            "b.booker.id = ?1 and " +
+            "b.startDate > CURRENT_TIMESTAMP " +
+            "order by b.startDate desc")
+    List<Booking> findFutureByBookerIdOrderByStartDateDesc(Long bookerId, Pageable page);
 
-    List<Booking> findAlByBooker_IdAndStatusOrderByStartDateDesc(Long bookerId, Status status);
+    List<Booking> findAlByBooker_IdAndStatusOrderByStartDateDesc(Long bookerId, Status status, Pageable page);
 
-    @Query("select b from Booking as b inner join Item as i  on b.item = i where " +
+    @Query("select b from Booking as b " +
+            "inner join Item as i on b.item = i " +
+            "where " +
             "i.owner.id = ?1 " +
             "order by b.startDate desc")
-    List<Booking> findAllByOwnerIdOrderByStartDateDesc(Long ownerId);
+    List<Booking> findAllByOwnerIdOrderByStartDateDesc(Long ownerId, Pageable page);
 
-    @Query(value = "select * from bookings as b " +
-            "inner join items as i on b.item_id = i.id " +
+    @Query("select b from Booking as b " +
+            "inner join Item as i on b.item = i " +
             "where " +
-            "i.owner_id = ?1 and " +
-            "b.start_date <= CURRENT_TIMESTAMP and " +
-            "b.end_date > CURRENT_TIMESTAMP and " +
-            "b.status in ('APPROVED', 'REJECTED') " +
-            "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findCurrentByOwnerIdOrderByStartDateDesc(Long ownerId);
+            "i.owner.id = ?1 and " +
+            "b.startDate <= CURRENT_TIMESTAMP and " +
+            "b.endDate > CURRENT_TIMESTAMP and " +
+            "b.status in (ru.practicum.shareit.booking.Status.APPROVED, " +
+            "             ru.practicum.shareit.booking.Status.REJECTED) " +
+            "order by b.startDate desc")
+    List<Booking> findCurrentByOwnerIdOrderByStartDateDesc(Long ownerId, Pageable page);
 
     @Query(value = "select * from bookings as b " +
             "inner join items as i on b.item_id = i.id " +
@@ -67,22 +72,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "limit 1", nativeQuery = true)
     Optional<Booking> findLastByItemId(Long itemId);
 
-    @Query(value = "select * from bookings as b " +
-            "inner join items as i on b.item_id = i.id " +
+    @Query("select b from Booking as b " +
+            "inner join Item as i on b.item = i " +
             "where " +
-            "i.owner_id = ?1 and " +
-            "b.end_date <= CURRENT_TIMESTAMP and " +
-            "b.status = 'APPROVED' " +
-            "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findPastByOwnerIdOrderByStartDateDesc(Long ownerId);
+            "i.owner.id = ?1 and " +
+            "b.endDate <= CURRENT_TIMESTAMP and " +
+            "b.status = ru.practicum.shareit.booking.Status.APPROVED " +
+            "order by b.startDate desc")
+    List<Booking> findPastByOwnerIdOrderByStartDateDesc(Long ownerId, Pageable page);
 
-    @Query(value = "select * from bookings as b " +
-            "inner join items as i on b.item_id = i.id " +
+    @Query("select b from Booking as b " +
+            "inner join Item as i on b.item= i " +
             "where " +
-            "i.owner_id = ?1 and " +
-            "b.start_date > CURRENT_TIMESTAMP " +
-            "order by b.start_date desc", nativeQuery = true)
-    List<Booking> findFutureByOwnerIdOrderByStartDateDesc(long ownerId);
+            "i.owner.id = ?1 and " +
+            "b.startDate > CURRENT_TIMESTAMP " +
+            "order by b.startDate desc")
+    List<Booking> findFutureByOwnerIdOrderByStartDateDesc(long ownerId, Pageable page);
 
     @Query(value = "select * from bookings b " +
             "inner join items as i on b.item_id = i.id " +
@@ -104,6 +109,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     List<Booking> findIntersectionPeriods(Long itemId, OffsetDateTime start, OffsetDateTime end);
 
-    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDateDesc(Long ownerId, Status status);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDateDesc(Long ownerId, Status status, Pageable page);
 
 }

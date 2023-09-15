@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,60 +136,64 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingAnswerDto> getBookingsByBookerId(Long bookerId, State state) {
+    @Transactional
+    public List<BookingAnswerDto> getBookingsByBookerId(long bookerId, State state, int from, int size) {
 
         findUserByIdLockRead(bookerId);
+
+        Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
 
         switch (state) {
             case ALL:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findAllByBookerIdOrderByStartDateDesc(bookerId));
+                        .findAllByBookerIdOrderByStartDateDesc(bookerId, page));
             case CURRENT:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findCurrentByBookerIdOrderByStartDateAsc(bookerId));
+                        .findCurrentByBookerIdOrderByStartDateAsc(bookerId, page));
             case PAST:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findPastByBookerIdOrderByStartDateDesc(bookerId));
+                        .findPastByBookerIdOrderByStartDateDesc(bookerId, page));
             case FUTURE:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findFutureByBookerIdOrderByStartDateDesc(bookerId));
+                        .findFutureByBookerIdOrderByStartDateDesc(bookerId, page));
             case WAITING:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findAlByBooker_IdAndStatusOrderByStartDateDesc(bookerId, Status.WAITING));
+                        .findAlByBooker_IdAndStatusOrderByStartDateDesc(bookerId, Status.WAITING, page));
             case REJECTED:
-                return bookingMapper.toDtoList(bookingRepository
-                        .findAlByBooker_IdAndStatusOrderByStartDateDesc(bookerId, Status.REJECTED));
             default:
-                throw new IllegalStateException("Unexpected value: " + state);
+                return bookingMapper.toDtoList(bookingRepository
+                        .findAlByBooker_IdAndStatusOrderByStartDateDesc(bookerId, Status.REJECTED, page));
         }
     }
 
     @Override
-    public List<BookingAnswerDto> getBookingsByOwnerId(Long ownerId, State state) {
+    @Transactional
+    public List<BookingAnswerDto> getBookingsByOwnerId(long ownerId, State state, int from, int size) {
 
         findUserByIdLockRead(ownerId);
+
+        Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
 
         switch (state) {
             case ALL:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findAllByOwnerIdOrderByStartDateDesc(ownerId));
+                        .findAllByOwnerIdOrderByStartDateDesc(ownerId, page));
             case CURRENT:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findCurrentByOwnerIdOrderByStartDateDesc(ownerId));
+                        .findCurrentByOwnerIdOrderByStartDateDesc(ownerId, page));
             case PAST:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findPastByOwnerIdOrderByStartDateDesc(ownerId));
+                        .findPastByOwnerIdOrderByStartDateDesc(ownerId, page));
             case FUTURE:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findFutureByOwnerIdOrderByStartDateDesc(ownerId));
+                        .findFutureByOwnerIdOrderByStartDateDesc(ownerId, page));
             case WAITING:
                 return bookingMapper.toDtoList(bookingRepository
-                        .findAllByItemOwnerIdAndStatusOrderByStartDateDesc(ownerId, Status.WAITING));
+                        .findAllByItemOwnerIdAndStatusOrderByStartDateDesc(ownerId, Status.WAITING, page));
             case REJECTED:
-                return bookingMapper.toDtoList(bookingRepository
-                        .findAllByItemOwnerIdAndStatusOrderByStartDateDesc(ownerId, Status.REJECTED));
             default:
-                throw new IllegalStateException("Unexpected value: " + state);
+                return bookingMapper.toDtoList(bookingRepository
+                        .findAllByItemOwnerIdAndStatusOrderByStartDateDesc(ownerId, Status.REJECTED, page));
         }
     }
 }

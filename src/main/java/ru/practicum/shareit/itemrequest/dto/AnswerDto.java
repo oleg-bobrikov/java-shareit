@@ -1,14 +1,16 @@
 package ru.practicum.shareit.itemrequest.dto;
 
 import lombok.Data;
+import ru.practicum.shareit.item.dto.ItemShortAnswerDto;
 import ru.practicum.shareit.user.User;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
-public class ItemRequestDto {
+public class AnswerDto {
     private Integer id;
     private String description;
     private User requester;
-    private LocalDate created;
+    private String created;
+    private List<ItemShortAnswerDto> items;
 }

@@ -1,12 +1,15 @@
 package ru.practicum.shareit.itemrequest;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "requests")
 public class ItemRequest {
@@ -17,10 +20,11 @@ public class ItemRequest {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
 
-    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Instant created = Instant.now();
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", name = "created_date")
+    @Builder.Default
+    private OffsetDateTime createdDate = OffsetDateTime.now();
 }

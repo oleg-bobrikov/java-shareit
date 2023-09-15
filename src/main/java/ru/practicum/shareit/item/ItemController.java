@@ -50,7 +50,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemAnswerDto> getItems(@RequestHeader("X-Sharer-User-Id") long ownerId) {
-        return itemService.getItems(ownerId);
+        return itemService.getItemsByOwnerId(ownerId);
     }
 
     @GetMapping("/search")

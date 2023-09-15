@@ -8,12 +8,15 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.itemrequest.ItemRequest;
+import ru.practicum.shareit.itemrequest.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -23,6 +26,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
+    private final ItemRequestRepository itemRequestRepository;
     private final UserService userService;
     private final UserMapper userMapper;
     private final BookingRepository bookingRepository;
@@ -35,8 +39,16 @@ public class ItemServiceImpl implements ItemService {
     public ItemAnswerDto createItem(ItemPostRequestDto itemPostRequestDto) {
 
         User user = userMapper.toModel(userService.getUserById(itemPostRequestDto.getOwnerId()));
+        Long requestId = itemPostRequestDto.getRequestId();
+
         Item item = itemMapper.toModel(itemPostRequestDto);
         item.setOwner(user);
+
+        if (requestId != null){
+            item.setItemRequest(itemRequestRepository.findById(requestId)
+                    .orElseThrow(() -> new NotFoundException("Item request with id " + requestId + " is not found")));
+        }
+
 
         return itemMapper.toDto(itemRepository.save(item));
     }
@@ -69,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemAnswerDto getItem(long itemId,long userId) {
+    public ItemAnswerDto getItem(long itemId, long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
 
@@ -92,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemAnswerDto> getItems(Long ownerId) {
+    public List<ItemAnswerDto> getItemsByOwnerId(Long ownerId) {
 
         return itemRepository.findByOwnerId(ownerId).stream().map(item -> {
 

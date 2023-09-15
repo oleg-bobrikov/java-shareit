@@ -34,7 +34,7 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "request_id")
     private ItemRequest itemRequest;
 
