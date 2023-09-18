@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserShortDto;
 
 import java.util.List;
 
@@ -17,15 +18,16 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    @Transactional
+    public UserDto createUser(UserShortDto userDto) {
             return userMapper.toDto(userRepository.save(userMapper.toModel(userDto)));
     }
 
     @Override
     @Transactional
-    public UserDto patchUser(UserDto userDto) {
+    public UserDto patchUser(long userId, UserShortDto userDto) {
 
-        User user = userMapper.toModel(getUserById(userDto.getId()));
+        User user = userMapper.toModel(getUserById(userId));
 
         boolean hasChanged = false;
 
@@ -48,20 +50,23 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto getUserById(Long id) {
+    @Transactional(readOnly = true)
+    public UserDto getUserById(long id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("user with id " + id + " is not exist"));
         return userMapper.toDto(user);
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    @Transactional
+    public void deleteUserById(long id) {
         getUserById(id);
 
         userRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getUsers() {
         return userMapper.toDtoList(userRepository.findAll());
     }

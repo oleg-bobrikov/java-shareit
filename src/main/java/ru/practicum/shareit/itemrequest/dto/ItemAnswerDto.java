@@ -7,7 +7,7 @@ import ru.practicum.shareit.user.User;
 import java.util.List;
 
 @Data
-public class AnswerDto {
+public class ItemAnswerDto {
     private Integer id;
     private String description;
     private User requester;

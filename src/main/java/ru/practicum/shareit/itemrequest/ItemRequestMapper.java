@@ -8,7 +8,7 @@ import org.mapstruct.Named;
 import ru.practicum.shareit.converter.InstantConverter;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemShortAnswerDto;
-import ru.practicum.shareit.itemrequest.dto.AnswerDto;
+import ru.practicum.shareit.itemrequest.dto.ItemAnswerDto;
 import ru.practicum.shareit.user.User;
 
 import java.util.List;
@@ -18,12 +18,12 @@ public interface ItemRequestMapper {
     @Mapping(target = "created", expression = "java(InstantConverter.toPattern(request.getCreatedDate().toInstant()))")
     @Mapping(target = "items", expression = "java(new ArrayList<ItemShortAnswerDto>())")
     @Named(value = "useMe")
-    AnswerDto toDto(ItemRequest request);
+    ItemAnswerDto toDto(ItemRequest request);
 
     @IterableMapping(qualifiedByName = "useMe")
-    List<AnswerDto> toDto(List<ItemRequest> requests);
+    List<ItemAnswerDto> toDto(List<ItemRequest> requests);
 
     @Mapping(target = "created", expression = "java(InstantConverter.toPattern(request.getCreatedDate().toInstant()))")
     @Mapping(target = "items", expression = "java(new ArrayList<ItemShortAnswerDto>())")
-    AnswerDto toShortDto(ItemRequest request);
+    ItemAnswerDto toShortDto(ItemRequest request);
 }

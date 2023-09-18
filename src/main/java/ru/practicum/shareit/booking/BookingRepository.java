@@ -17,8 +17,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.endDate > CURRENT_TIMESTAMP and " +
             "b.status in (ru.practicum.shareit.booking.Status.APPROVED, " +
             "             ru.practicum.shareit.booking.Status.REJECTED) " +
-            "order by b.startDate")
-    List<Booking> findCurrentByBookerIdOrderByStartDateAsc(Long bookerId, Pageable page);
+            "order by b.startDate desc ")
+    List<Booking> findCurrentByBookerIdOrderByStartDateDesc(Long bookerId, Pageable page);
 
     @Query("select b from Booking b where " +
             "b.booker.id = ?1 and " +
