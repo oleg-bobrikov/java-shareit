@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserShortDto userDto) {
-            return userMapper.toDto(userRepository.save(userMapper.toModel(userDto)));
+        return userMapper.toDto(userRepository.save(userMapper.toModel(userDto)));
     }
 
     @Override
@@ -28,8 +28,11 @@ public class UserServiceImpl implements UserService {
     public UserDto patchUser(long userId, UserShortDto userDto) {
 
         User user = userMapper.toModel(getUserById(userId));
-
         boolean hasChanged = false;
+
+        if (userDto.getName() == null && userDto.getEmail() == null) {
+            return userMapper.toDto(user);
+        }
 
         if (userDto.getName() != null && !userDto.getName().equals(user.getName())) {
             user.setName(userDto.getName());
@@ -37,10 +40,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userDto.getEmail() != null && !userDto.getEmail().equals(user.getEmail())) {
-            if (!userRepository.findAllByEmail(userDto.getEmail()).isEmpty()) {
-                throw new DataIntegrityViolationException(" user with email " + userDto.getEmail() + " has already assigned.");
-            }
-
+            validateEmail(userDto.getEmail());
             user.setEmail(userDto.getEmail());
             hasChanged = true;
         }
@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(hasChanged ? userRepository.save(user) : user);
     }
 
+    private void validateEmail(String email) {
+        if (!userRepository.findAllByEmail(email).isEmpty()) {
+            throw new DataIntegrityViolationException(" user with email " + email + " has already assigned.");
+        }
+    }
 
     @Override
     @Transactional(readOnly = true)

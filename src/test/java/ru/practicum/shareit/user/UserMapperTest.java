@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserShortDto;
+import ru.practicum.shareit.util.Generator;
 
 import java.util.Collections;
 
@@ -12,14 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
-
-    User createTestUser() {
-        return User.builder()
-                .id(1L)
-                .email("john.doe@mail.com")
-                .name("John")
-                .build();
-    }
 
     UserDto createTestUserDto() {
         return UserDto.builder()
@@ -41,7 +34,7 @@ class UserMapperTest {
 
         assertNull(mapper.toDto((User) null));
 
-        User user = createTestUser();
+        User user = Generator.makeUser();
 
         assertThat(mapper.toDto(user))
                 .hasFieldOrPropertyWithValue("id", user.getId())
@@ -76,7 +69,7 @@ class UserMapperTest {
     void shouldMapUserShortDtoToDto() {
         assertNull(mapper.toDto((UserShortDto) null));
 
-        User user = createTestUser();
+        User user = Generator.makeUser();
         assertThat(mapper.toDto(user))
                 .hasFieldOrPropertyWithValue("name", user.getName())
                 .hasFieldOrPropertyWithValue("email", user.getEmail());
@@ -86,7 +79,7 @@ class UserMapperTest {
     void shouldMapListOfUsersToDtoList() {
         assertNull(mapper.toDtoList(null));
 
-        User user = createTestUser();
+        User user = Generator.makeUser();
         assertThat(mapper.toDtoList(Collections.singletonList(user)))
                 .asList()
                 .hasSize(1)

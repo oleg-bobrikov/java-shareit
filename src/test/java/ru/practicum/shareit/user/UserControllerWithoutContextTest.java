@@ -15,13 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.dto.UserShortDto;
+import ru.practicum.shareit.util.Generator;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,24 +36,28 @@ class UserControllerWithoutContextTest {
     private UserController controller;
     @Mock
     private UserService userService;
+    @Mock
+    private UserRepository userRepository;
     private MockMvc mvc;
-    private UserDto userDto;
+
+    UserShortDto createTestUserShortDtoWithNotValidEmail() {
+        return UserShortDto.builder()
+                .email("123")
+                .name("username")
+                .build();
+    }
 
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders
                 .standaloneSetup(controller)
                 .build();
-
-        userDto = UserDto.builder()
-                .id(1L)
-                .email("john.doe@mail.com")
-                .name("John")
-                .build();
     }
 
     @Test
-    void shouldGetUsers() throws Exception {
+    void getUsers_userExist_returnsListOfUsersWithStatusOK() throws Exception {
+        UserDto userDto = Generator.makeUserDto();
+
         when(userService.getUsers())
                 .thenReturn(Collections.singletonList(userDto));
 
@@ -63,12 +68,14 @@ class UserControllerWithoutContextTest {
                 .andExpect(jsonPath("$[0].email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$[0].name", is(userDto.getName())));
 
+        verify(userService, times(1)).getUsers();
     }
 
     @Test
-    void shouldGetUserById() throws Exception {
-
-        when(userService.getUserById(1L))
+    void getUserById_userExist_returnStatusOkAndValidJSON() throws Exception {
+        UserDto userDto = Generator.makeUserDto();
+        long userId = 1L;
+        when(userService.getUserById(userId))
                 .thenReturn(userDto);
 
         mvc.perform(get("/users/{userId}", 1))
@@ -76,10 +83,14 @@ class UserControllerWithoutContextTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$.name", is(userDto.getName())));
+
+        verify(userService, times(1)).getUserById(userId);
     }
 
     @Test
-    void shouldCreateUser() throws Exception {
+    void createUser_userDtoIsValid_returnsStatusOkAndValidJson() throws Exception {
+        UserDto userDto = Generator.makeUserDto();
+
         UserShortDto request = UserShortDto.builder()
                 .email(userDto.getEmail())
                 .name(userDto.getName())
@@ -101,47 +112,53 @@ class UserControllerWithoutContextTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$.name", is(userDto.getName())));
+
+        verify(userService, times(1)).createUser(request);
     }
 
     @Test
-    void shouldDeleteUser() throws Exception {
+    void delete_userIdIsValid_returnsNoContent() throws Exception {
 
-        mvc.perform(delete("/users/{userId}", 1))
+        long userId = 1L;
+
+        mvc.perform(delete("/users/{userId}", userId))
                 .andExpect(status().isNoContent());
+
+        verify(userService, times(1)).deleteUserById(userId);
     }
 
     @Test
-    void shouldUpdateUser() throws Exception {
+    void patchUser_userIsFound_returnsStatusOkAndValidJson() throws Exception {
 
         UserShortDto patch = UserShortDto.builder()
                 .name("new name")
                 .email("updateEamil@mail.com")
                 .build();
+        long userId = 1L;
 
-        when(userService.patchUser(1L, patch))
+        when(userService.patchUser(userId, patch))
                 .thenAnswer(invocationOnMock -> {
                     UserDto answer = userMapper.toDto(invocationOnMock.getArgument(1, UserShortDto.class));
-                    answer.setId(1L);
+                    answer.setId(userId);
                     return answer;
                 });
 
-        mvc.perform(patch("/users/{userId}", 1)
+        mvc.perform(patch("/users/{userId}", userId)
                         .content(mapper.writeValueAsString(patch))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1L), Long.class))
+                .andExpect(jsonPath("$.id", is(userId), Long.class))
                 .andExpect(jsonPath("$.email", is(patch.getEmail())))
                 .andExpect(jsonPath("$.name", is(patch.getName())));
+
+        verify(userService, times(1)).patchUser(userId, patch);
     }
 
     @Test
-    void shouldNotCreateUserWhenEmailIsNotValid() throws Exception {
-        UserShortDto request = UserShortDto.builder()
-                .email("123")
-                .name("username")
-                .build();
+    void createUser_emailIsInvalid_returnsBadRequest() throws Exception {
+        UserShortDto request = createTestUserShortDtoWithNotValidEmail();
 
         mvc.perform(post("/users")
                         .content(mapper.writeValueAsString(request))
@@ -154,6 +171,7 @@ class UserControllerWithoutContextTest {
                     assert exception != null;
                     assert exception instanceof MethodArgumentNotValidException;
                 });
+        verify(userService, never()).createUser(request);
     }
 
 }

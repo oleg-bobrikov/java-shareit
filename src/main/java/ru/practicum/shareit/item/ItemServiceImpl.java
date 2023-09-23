@@ -32,13 +32,13 @@ public class ItemServiceImpl implements ItemService {
     private final CommentMapper commentMapper;
 
     @Override
-    public ItemAnswerDto createItem(ItemPostRequestDto itemPostRequestDto) {
+    public ItemAnswerDto createItem(long ownerId, ItemPostRequestDto itemPostRequestDto) {
 
-        User user = userMapper.toModel(userService.getUserById(itemPostRequestDto.getOwnerId()));
+        User owner = userMapper.toModel(userService.getUserById(ownerId));
         Long requestId = itemPostRequestDto.getRequestId();
 
         Item item = itemMapper.toModel(itemPostRequestDto);
-        item.setOwner(user);
+        item.setOwner(owner);
 
         if (requestId != null) {
             item.setItemRequest(itemRequestRepository.findById(requestId)

@@ -96,7 +96,7 @@ public class CustomExceptionHandler {
     public ResponseError handle(UnsupportedStatusException exception) {
         log.error(exception.getMessage(), exception);
         return ResponseError.builder()
-                .error(exception.getMessage())
+                .error("BAD REQUEST")
                 .status(400)
                 .exception("ru.practicum.shareit.exception.UnsupportedStatusException")
                 .message(exception.getMessage())

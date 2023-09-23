@@ -190,6 +190,13 @@
                     <version>0.8.8</version>
                     <configuration>
                         <output>file</output>
+                        <excludes>
+                            <exclude>ru/practicum/shareit/booking/Status.class</exclude>
+                            <exclude>ru/practicum/shareit/booking/StateConverter.class</exclude>
+                            <exclude>ru/practicum/shareit/ShareItApp.class</exclude>
+                            <exclude>ru/practicum/shareit/exception/*.class</exclude>
+                            <exclude>ru/practicum/shareit/converter/InstantConverter.class</exclude>
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>

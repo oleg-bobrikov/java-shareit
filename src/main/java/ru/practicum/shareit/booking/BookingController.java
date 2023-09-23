@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.*;
-import ru.practicum.shareit.converter.StateConverter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;

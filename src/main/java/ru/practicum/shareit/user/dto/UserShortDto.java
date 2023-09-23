@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.validator.ApacheEmail;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserShortDto {

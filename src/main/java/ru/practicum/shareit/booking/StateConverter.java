@@ -1,6 +1,5 @@
-package ru.practicum.shareit.converter;
+package ru.practicum.shareit.booking;
 
-import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.exception.UnsupportedStateException;
 
 public class StateConverter {
