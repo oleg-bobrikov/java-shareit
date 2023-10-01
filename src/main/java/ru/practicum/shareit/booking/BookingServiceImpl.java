@@ -29,15 +29,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public BookingAnswerDto createBooking(BookingRequestDto bookingRequestDto) {
+    public BookingAnswerDto createBooking(long bookerId, BookingRequestDto bookingRequestDto) {
 
         Instant startDate = InstantConverter.fromPattern(bookingRequestDto.getStart());
         Instant endDAte = InstantConverter.fromPattern(bookingRequestDto.getEnd());
 
         validatePeriod(startDate, endDAte);
 
-        User booker = findUserByIdLockRead(bookingRequestDto.getBookerId());
-        Item item = findByIdLockRead(bookingRequestDto.getItemId());
+        User booker = findUserById(bookerId);
+        Item item = findItemById(bookingRequestDto.getItemId());
 
         if (!item.getIsAvailable()) {
             throw new NotAvailableException("Item with id " + bookingRequestDto.getItemId() + " is not available for booking");
@@ -84,17 +84,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public BookingAnswerDto approve(BookingApproveDto bookingApproveDto) {
+    public BookingAnswerDto approve(long ownerId, long bookingId, boolean approved) {
 
-        Booking booking = findBookingById(bookingApproveDto.getBookingId());
+        Booking booking = findBookingById(bookingId);
 
-        if (!booking.getItem().getOwner().getId().equals(bookingApproveDto.getOwnerId())) {
-            throw new NotFoundException("Booking with id " + bookingApproveDto.getBookingId() + " should have valid owner ID");
+        if (!booking.getItem().getOwner().getId().equals(ownerId)) {
+            throw new NotFoundException("Booking with id " + bookingId + " should have valid owner ID");
         }
 
         if (!booking.getStatus().equals(Status.WAITING)) {
-            throw new UnsupportedStatusException("Wrong status for booking with id " + bookingApproveDto.getBookingId());
-        } else if (bookingApproveDto.getApproved()) {
+            throw new UnsupportedStatusException("Wrong status for booking with id " + bookingId);
+        } else if (approved) {
             booking.setStatus(Status.APPROVED);
         } else {
             booking.setStatus(Status.REJECTED);
@@ -103,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
-    private User findUserByIdLockRead(Long userId) {
+    private User findUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " is not exist"));
     }
@@ -113,24 +113,23 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingId + " is not exist"));
     }
 
-    private Item findByIdLockRead(Long itemId) {
+    private Item findItemById(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
     }
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public BookingAnswerDto getBooking(BookingGetDto bookingGetDto) {
+    public BookingAnswerDto getBooking(long userId, long bookingId) {
 
-        User user = findUserByIdLockRead(bookingGetDto.getUserId());
+       findUserById(userId);
 
-        Booking booking = findBookingById(bookingGetDto.getBookingId());
+        Booking booking = findBookingById(bookingId);
 
         long ownerId = booking.getItem().getOwner().getId();
-        long userId = user.getId();
         long bookerId = booking.getBooker().getId();
         if (!(userId == ownerId || userId == bookerId)) {
-            throw new NotFoundException("User with id " + bookingGetDto.getUserId() + " is not valid.");
+            throw new NotFoundException("User with id " + userId + " is not valid.");
         }
         return bookingMapper.toDto(booking);
     }
@@ -139,7 +138,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public List<BookingAnswerDto> getBookingsByBookerId(long bookerId, State state, int from, int size) {
 
-        findUserByIdLockRead(bookerId);
+        findUserById(bookerId);
 
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
 
@@ -170,7 +169,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public List<BookingAnswerDto> getBookingsByOwnerId(long ownerId, State state, int from, int size) {
 
-        findUserByIdLockRead(ownerId);
+        findUserById(ownerId);
 
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
 

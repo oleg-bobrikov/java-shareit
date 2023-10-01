@@ -34,7 +34,7 @@ class UserMapperTest {
 
         assertNull(mapper.toDto((User) null));
 
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
 
         assertThat(mapper.toDto(user))
                 .hasFieldOrPropertyWithValue("id", user.getId())
@@ -69,7 +69,7 @@ class UserMapperTest {
     void shouldMapUserShortDtoToDto() {
         assertNull(mapper.toDto((UserShortDto) null));
 
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
         assertThat(mapper.toDto(user))
                 .hasFieldOrPropertyWithValue("name", user.getName())
                 .hasFieldOrPropertyWithValue("email", user.getEmail());
@@ -79,7 +79,7 @@ class UserMapperTest {
     void shouldMapListOfUsersToDtoList() {
         assertNull(mapper.toDtoList(null));
 
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
         assertThat(mapper.toDtoList(Collections.singletonList(user)))
                 .asList()
                 .hasSize(1)

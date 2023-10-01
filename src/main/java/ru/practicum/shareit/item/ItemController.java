@@ -25,19 +25,14 @@ public class ItemController {
     public CommentAnswerDto createComment(@RequestHeader("X-Sharer-User-Id") long authorId,
                                           @Valid @RequestBody CommentPostRequestDto commentDto,
                                           @PathVariable long itemId) {
-        commentDto.setItemId(itemId);
-        commentDto.setAuthorId(authorId);
-
-        return itemService.createComment(commentDto);
+        return itemService.createComment(authorId, commentDto, itemId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemAnswerDto patchItem(@RequestHeader("X-Sharer-User-Id") long ownerId,
                                    @Valid @RequestBody ItemPatchRequestDto itemDto,
                                    @PathVariable long itemId) {
-        itemDto.setOwnerId(ownerId);
-        itemDto.setId(itemId);
-        return itemService.patchItem(itemDto);
+        return itemService.patchItem(ownerId, itemDto, itemId);
     }
 
     @GetMapping("/{itemId}")

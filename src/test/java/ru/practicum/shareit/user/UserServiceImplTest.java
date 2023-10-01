@@ -55,7 +55,7 @@ class UserServiceImplTest {
 
     @Test
     void getUserById_userExist_returnDto() {
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
         when(userRepository.findById(Mockito.any(Long.class)))
                 .thenReturn(Optional.of(user));
 
@@ -81,7 +81,7 @@ class UserServiceImplTest {
 
     @Test
     void deleteUserById_userExists_delete() {
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
         when(userRepository.findById(Mockito.any(Long.class)))
                 .thenReturn(Optional.of(user));
 
@@ -92,7 +92,7 @@ class UserServiceImplTest {
 
     @Test
     void getUsers_usersAreExist_returnListOfDto() {
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
         when(userRepository.findAll())
                 .thenReturn(Collections.singletonList((user)));
 
@@ -276,7 +276,7 @@ class UserServiceImplTest {
     void validateEmail_newEmailExist_throwException() {
         // arrange
         UserDto userDto = Generator.makeUserDto();
-        User user = Generator.makeUser();
+        User user = Generator.makeUser1();
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(userMapper.toModel(userDto)));
         when(userRepository.findAllByEmail(anyString()))
                 .thenReturn(Collections.singletonList(user));

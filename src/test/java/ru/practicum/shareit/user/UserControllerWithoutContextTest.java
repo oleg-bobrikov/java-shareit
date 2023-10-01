@@ -36,8 +36,6 @@ class UserControllerWithoutContextTest {
     private UserController controller;
     @Mock
     private UserService userService;
-    @Mock
-    private UserRepository userRepository;
     private MockMvc mvc;
 
     UserShortDto createTestUserShortDtoWithNotValidEmail() {
@@ -55,7 +53,7 @@ class UserControllerWithoutContextTest {
     }
 
     @Test
-    void getUsers_userExist_returnsListOfUsersWithStatusOK() throws Exception {
+    void getUsers_userExist_returnListOfUsersWithStatusOK() throws Exception {
         UserDto userDto = Generator.makeUserDto();
 
         when(userService.getUsers())
@@ -88,7 +86,7 @@ class UserControllerWithoutContextTest {
     }
 
     @Test
-    void createUser_userDtoIsValid_returnsStatusOkAndValidJson() throws Exception {
+    void createUser_validUserDto_returnsStatusOkAndValidJson() throws Exception {
         UserDto userDto = Generator.makeUserDto();
 
         UserShortDto request = UserShortDto.builder()
@@ -117,7 +115,7 @@ class UserControllerWithoutContextTest {
     }
 
     @Test
-    void delete_userIdIsValid_returnsNoContent() throws Exception {
+    void delete_validUserId_returnNoContent() throws Exception {
 
         long userId = 1L;
 
@@ -128,7 +126,7 @@ class UserControllerWithoutContextTest {
     }
 
     @Test
-    void patchUser_userIsFound_returnsStatusOkAndValidJson() throws Exception {
+    void patchUser_userFound_returnsStatusOkAndValidJson() throws Exception {
 
         UserShortDto patch = UserShortDto.builder()
                 .name("new name")
@@ -157,7 +155,7 @@ class UserControllerWithoutContextTest {
     }
 
     @Test
-    void createUser_emailIsInvalid_returnsBadRequest() throws Exception {
+    void createUser_invalidEmail_returnsBadRequest() throws Exception {
         UserShortDto request = createTestUserShortDtoWithNotValidEmail();
 
         mvc.perform(post("/users")

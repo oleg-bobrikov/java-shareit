@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -8,6 +9,7 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.itemrequest.ItemRequest;
 import ru.practicum.shareit.itemrequest.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
@@ -41,17 +43,15 @@ public class ItemServiceImpl implements ItemService {
         item.setOwner(owner);
 
         if (requestId != null) {
-            item.setItemRequest(itemRequestRepository.findById(requestId)
-                    .orElseThrow(() -> new NotFoundException("Item request with id " + requestId + " is not found")));
+            item.setItemRequest(findItemRequestById(requestId));
         }
 
         return itemMapper.toDto(itemRepository.save(item));
     }
 
     @Override
-    public ItemAnswerDto patchItem(ItemPatchRequestDto itemDto) {
-        Item item = itemRepository.findByIdAndOwnerId(itemDto.getId(), itemDto.getOwnerId())
-                .orElseThrow(() -> new NotFoundException("Item with id " + itemDto.getId() + " is not exist"));
+    public ItemAnswerDto patchItem(long ownerId, ItemPatchRequestDto itemDto, long itemId) {
+        Item item = findByIdAndOwnerId(itemId, ownerId);
 
         boolean hasChanged = false;
 
@@ -77,8 +77,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemAnswerDto getItem(long itemId, long userId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
+        Item item = findById(itemId);
 
         ItemAnswerDto itemAnswerDto = itemMapper.toDto(item);
 
@@ -129,19 +128,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentAnswerDto createComment(CommentPostRequestDto commentDto) {
+    public CommentAnswerDto createComment(long authorId, CommentPostRequestDto commentDto, long itemId) {
+        checkLastBookedByBookerIdAndItemId(authorId, itemId);
 
-        bookingRepository.findLastBookedByBookerIdAndItemId(commentDto.getAuthorId(),
-                commentDto.getItemId()).orElseThrow(() ->
-                new NotAvailableException(
-                        String.format("item_id %s should be booked by user_id %s",
-                                commentDto.getItemId(), commentDto.getAuthorId())));
+        Item item = findById(itemId);
 
-        Item item = itemRepository.findById(commentDto.getItemId()).orElseThrow(
-                () -> new NotFoundException(
-                        String.format("item_Id %s is not found", commentDto.getItemId())));
-
-        User author = userMapper.toModel(userService.getUserById(commentDto.getAuthorId()));
+        User author = userMapper.toModel(userService.getUserById(authorId));
 
         Comment comment = Comment.builder()
                 .item(item)
@@ -149,5 +141,27 @@ public class ItemServiceImpl implements ItemService {
                 .text(commentDto.getText())
                 .build();
         return commentMapper.toDto(commentRepository.save(comment));
+    }
+
+    private Item findById(long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(
+                () -> new NotFoundException(
+                        String.format("item_Id %s is not found", itemId)));
+    }
+
+    private void checkLastBookedByBookerIdAndItemId(long authorId, long itemId) {
+        bookingRepository.findLastBookedByBookerIdAndItemId(authorId, itemId)
+                .orElseThrow(() -> new NotAvailableException(
+                        String.format("item_id %s should be booked by user_id %s", itemId, authorId)));
+    }
+
+    private Item findByIdAndOwnerId(long itemId, long ownerId) {
+        return itemRepository.findByIdAndOwnerId(itemId, ownerId)
+                .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not exist"));
+    }
+
+    private ItemRequest findItemRequestById(long id) {
+        return itemRequestRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Item request with id " + id + " is not found"));
     }
 }
