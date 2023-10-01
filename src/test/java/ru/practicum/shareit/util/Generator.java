@@ -117,7 +117,7 @@ public class Generator {
                 .build();
     }
 
-    public static Booking makeBooking(){
+    public static Booking makeBooking() {
         return Booking.builder()
                 .id(1L)
                 .booker(Generator.makeUser2())

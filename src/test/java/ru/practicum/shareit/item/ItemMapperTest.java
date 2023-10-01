@@ -104,7 +104,7 @@ class ItemMapperTest {
         item.setOwner(user);
 
         // act
-       ItemShortAnswerDto actual = itemMapper.toShortDto(item);
+        ItemShortAnswerDto actual = itemMapper.toShortDto(item);
 
         // assert
         assertThat(actual)
@@ -114,6 +114,7 @@ class ItemMapperTest {
                 .hasFieldOrPropertyWithValue("description", item.getDescription())
                 .hasFieldOrPropertyWithValue("requestId", null);
     }
+
     @Test
     void toShortDto_itemWithRequest_returnItemShortAnswerDto() {
         // arrange
@@ -134,6 +135,7 @@ class ItemMapperTest {
                 .hasFieldOrPropertyWithValue("description", item.getDescription())
                 .hasFieldOrPropertyWithValue("requestId", itemRequest.getId());
     }
+
     @Test
     void toShortDto_itemList_returnItemShortAnswerDtoList() {
         // arrange
