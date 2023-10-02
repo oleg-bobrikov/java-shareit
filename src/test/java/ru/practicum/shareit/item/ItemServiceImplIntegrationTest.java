@@ -18,10 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class ItemServiceImplIntegrationTest {
     @Autowired
-    ItemService itemService;
+    private ItemService itemService;
     @Autowired
-    UserService userService;
-
+    private UserService userService;
     @Autowired
     ItemRepository itemRepository;
 
@@ -29,7 +28,7 @@ public class ItemServiceImplIntegrationTest {
     @DirtiesContext
     void createItem_createEntityOnService_returnSameEntityFromRepository() {
         // Arrange
-        UserShortDto userShortDto = Generator.makeUserShortDto();
+        UserShortDto userShortDto = Generator.makeUserShortDto1();
         UserDto newUser = userService.createUser(userShortDto);
         ItemPostRequestDto itemPostRequestDto = Generator.makeItemPostRequestDtoWithoutRequestId();
 

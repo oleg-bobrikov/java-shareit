@@ -16,14 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserServiceImplIntegrationTest {
     @Autowired
     private UserService userService;
-
-    @Autowired UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     @DirtiesContext
     void createUser_createEntityOnService_returnSameEntityFromRepository() {
         // Arrange
-        UserShortDto userShortDto = Generator.makeUserShortDto();
+        UserShortDto userShortDto = Generator.makeUserShortDto1();
 
         // Act
         UserDto actual = userService.createUser(userShortDto);

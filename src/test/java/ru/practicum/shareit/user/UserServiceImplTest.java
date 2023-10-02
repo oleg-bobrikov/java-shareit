@@ -36,7 +36,7 @@ class UserServiceImplTest {
 
     @Test
     void createUser_userIsValid_saveUserAndReturnDto() {
-        UserShortDto userShortDto = Generator.makeUserShortDto();
+        UserShortDto userShortDto = Generator.makeUserShortDto1();
 
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(invocationOnMock -> {
@@ -111,7 +111,7 @@ class UserServiceImplTest {
     void patchUser_noChanges_skip() {
 
         // arrange
-        UserShortDto userCreateRequest1 = Generator.makeUserShortDto();
+        UserShortDto userCreateRequest1 = Generator.makeUserShortDto1();
         Long userId = 1L;
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(invocationOnMock -> {
@@ -140,7 +140,7 @@ class UserServiceImplTest {
     @Test
     void patchUser_emailChanged_updateEmail() {
         // arrange
-        UserShortDto userCreateRequest1 = Generator.makeUserShortDto();
+        UserShortDto userCreateRequest1 = Generator.makeUserShortDto1();
         Long userId = 1L;
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(invocationOnMock -> {
@@ -174,7 +174,7 @@ class UserServiceImplTest {
     @Test
     void patchUser_nameChanged_updateName() {
         // arrange
-        UserShortDto userCreateRequest1 = Generator.makeUserShortDto();
+        UserShortDto userCreateRequest1 = Generator.makeUserShortDto1();
         Long userId = 1L;
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(invocationOnMock -> {
@@ -208,7 +208,7 @@ class UserServiceImplTest {
     @Test
     void patchUser_sameName_skipUpdate() {
         // arrange
-        UserShortDto request = Generator.makeUserShortDto();
+        UserShortDto request = Generator.makeUserShortDto1();
         final Long userId = 1L;
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(invocationOnMock -> {
@@ -242,7 +242,7 @@ class UserServiceImplTest {
     @Test
     void patchUser_sameEmail_skipUpdate() {
         // arrange
-        UserShortDto request = Generator.makeUserShortDto();
+        UserShortDto request = Generator.makeUserShortDto1();
         final Long userId = 1L;
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(invocationOnMock -> {

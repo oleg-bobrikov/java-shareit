@@ -18,10 +18,17 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 
 public class Generator {
-    public static UserShortDto makeUserShortDto() {
+    public static UserShortDto makeUserShortDto1() {
         return UserShortDto.builder()
                 .name("user1")
                 .email("user1@gmail.com")
+                .build();
+    }
+
+    public static UserShortDto makeUserShortDto2() {
+        return UserShortDto.builder()
+                .name("user2")
+                .email("user2@gmail.com")
                 .build();
     }
 
