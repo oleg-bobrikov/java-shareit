@@ -22,11 +22,13 @@ public class ItemAnswerDto {
 
     @Getter(AccessLevel.NONE)
     private List<CommentAnswerDto> comments;
-    public List<CommentAnswerDto> getComments(){
-        if (comments == null){
+
+    public List<CommentAnswerDto> getComments() {
+        if (comments == null) {
             comments = new ArrayList<>();
         }
         return comments;
     }
+
     private Long requestId;
 }
