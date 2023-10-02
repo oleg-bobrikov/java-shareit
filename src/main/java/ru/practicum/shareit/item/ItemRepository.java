@@ -8,14 +8,16 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Optional<Item> findByIdAndOwnerId(Long id, Long ownerId);
+    Optional<Item> findByIdAndOwnerId(long id, long ownerId);
 
-    List<Item> findByOwnerId(Long ownerId);
+    List<Item> findByOwnerId(long ownerId);
 
     @Query(" select i from Item as i " +
             "where i.isAvailable = true  and (lower(i.name) like lower(concat('%', ?1, '%')) " +
             " or lower(i.description) like lower(concat('%', ?1, '%')))")
     List<Item> search(String text);
+
+    List<Item> findByItemRequestId(long itemRequestId);
 
 }
 

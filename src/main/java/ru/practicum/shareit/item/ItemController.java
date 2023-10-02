@@ -18,27 +18,21 @@ public class ItemController {
     @PostMapping
     public ItemAnswerDto createItem(@RequestHeader("X-Sharer-User-Id") long ownerId,
                                     @Valid @RequestBody ItemPostRequestDto itemDto) {
-        itemDto.setOwnerId(ownerId);
-        return itemService.createItem(itemDto);
+        return itemService.createItem(ownerId, itemDto);
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentAnswerDto createComment(@RequestHeader("X-Sharer-User-Id") long authorId,
                                           @Valid @RequestBody CommentPostRequestDto commentDto,
                                           @PathVariable long itemId) {
-        commentDto.setItemId(itemId);
-        commentDto.setAuthorId(authorId);
-
-        return itemService.createComment(commentDto);
+        return itemService.createComment(authorId, commentDto, itemId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemAnswerDto patchItem(@RequestHeader("X-Sharer-User-Id") long ownerId,
                                    @Valid @RequestBody ItemPatchRequestDto itemDto,
                                    @PathVariable long itemId) {
-        itemDto.setOwnerId(ownerId);
-        itemDto.setId(itemId);
-        return itemService.patchItem(itemDto);
+        return itemService.patchItem(ownerId, itemDto, itemId);
     }
 
     @GetMapping("/{itemId}")
@@ -50,7 +44,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemAnswerDto> getItems(@RequestHeader("X-Sharer-User-Id") long ownerId) {
-        return itemService.getItems(ownerId);
+        return itemService.getItemsByOwnerId(ownerId);
     }
 
     @GetMapping("/search")
