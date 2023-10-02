@@ -11,8 +11,7 @@ import java.util.List;
 
 
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
-    @Query("select r from ItemRequest r where r.requester.id = :requesterId order by r.createdDate desc")
-    List<ItemRequest> findByRequesterIdOrderByCreatedDateDesc(@Param("requesterId") long requesterId);
+    List<ItemRequest> findByRequesterIdOrderByCreatedDateDesc(long requesterId);
 
     @Query("select r from ItemRequest r where r.requester.id <> :requesterId order by r.createdDate desc")
     Page<ItemRequest> findOthersByRequesterIdOrderByCreatedDateDesc(@Param("requesterId") long requesterId, Pageable page);
