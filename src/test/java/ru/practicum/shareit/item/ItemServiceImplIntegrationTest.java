@@ -11,6 +11,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserShortDto;
 import ru.practicum.shareit.util.Generator;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -20,9 +22,12 @@ public class ItemServiceImplIntegrationTest {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ItemRepository itemRepository;
+
     @Test
     @DirtiesContext
-    void createItem() {
+    void createItem_createEntityOnService_returnSameEntityFromRepository() {
         // Arrange
         UserShortDto userShortDto = Generator.makeUserShortDto();
         UserDto newUser = userService.createUser(userShortDto);
@@ -30,9 +35,18 @@ public class ItemServiceImplIntegrationTest {
 
         // Act
         ItemAnswerDto expected = itemService.createItem(newUser.getId(), itemPostRequestDto);
+        final long itemId = expected.getId();
         ItemAnswerDto actual = itemService.getItem(expected.getId(), newUser.getId());
+        Optional<Item> createdItem = itemRepository.findById(itemId);
 
         // Assert
         assertThat(actual).isEqualTo(expected);
+
+        assertThat(createdItem).isPresent()
+                .satisfies(item -> assertThat(item.get())
+                        .hasFieldOrPropertyWithValue("id", itemId)
+                        .hasFieldOrPropertyWithValue("name", expected.getName())
+                        .hasFieldOrPropertyWithValue("description", expected.getDescription())
+                        .hasFieldOrPropertyWithValue("isAvailable", expected.getAvailable()));
     }
 }
