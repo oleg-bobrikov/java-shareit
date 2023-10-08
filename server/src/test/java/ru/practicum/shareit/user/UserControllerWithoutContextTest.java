@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.user.dto.UserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,10 +36,6 @@ class UserControllerWithoutContextTest {
     @Mock
     private UserService userService;
     private MockMvc mvc;
-
-    UserRequestDto createTestUserRequestDtoWithNotValidEmail() {
-        return new UserRequestDto("username", "not valid email");
-    }
 
     @BeforeEach
     void setUp() {
@@ -154,7 +149,6 @@ class UserControllerWithoutContextTest {
 
         verify(userService, times(1)).patchUser(anyLong(), any(UserRequestDto.class));
     }
-
 
 
 }
