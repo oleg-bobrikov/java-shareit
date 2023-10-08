@@ -5,7 +5,6 @@ import org.mapstruct.Mapping;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 
-
 import java.util.List;
 
 @Mapper(imports = {User.class, UserRequestDto.class}, componentModel = "spring")
