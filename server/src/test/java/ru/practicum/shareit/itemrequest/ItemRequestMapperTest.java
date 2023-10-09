@@ -42,7 +42,6 @@ class ItemRequestMapperTest {
         assertThat(actual)
                 .hasFieldOrPropertyWithValue("id", itemRequest.getId())
                 .hasFieldOrPropertyWithValue("description", itemRequest.getDescription())
-                .hasFieldOrPropertyWithValue("requester", itemRequest.getRequester())
                 .hasFieldOrPropertyWithValue("created", itemRequest.getCreatedDate());
     }
 
@@ -60,7 +59,6 @@ class ItemRequestMapperTest {
                 .satisfies(list -> assertThat(list.get(0))
                         .hasFieldOrPropertyWithValue("id", itemRequest.getId())
                         .hasFieldOrPropertyWithValue("description", itemRequest.getDescription())
-                        .hasFieldOrPropertyWithValue("requester", itemRequest.getRequester())
                         .hasFieldOrPropertyWithValue("created", itemRequest.getCreatedDate()));
     }
 }

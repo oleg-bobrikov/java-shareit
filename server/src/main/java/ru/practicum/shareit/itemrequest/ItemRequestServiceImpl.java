@@ -72,7 +72,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private ItemRequestAnswerDto setItems(ItemRequestAnswerDto itemRequestAnswerDto) {
-        List<Item> items = itemRepository.findByItemRequestId(itemRequestAnswerDto.getRequester().getId());
+        List<Item> items = itemRepository.findByItemRequestId(itemRequestAnswerDto.getId());
         itemRequestAnswerDto.setItems(itemMapper.toShortDto(items));
         return itemRequestAnswerDto;
     }

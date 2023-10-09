@@ -58,7 +58,6 @@ class ItemRequestServiceTest {
         ItemRequestAnswerDto expected = ItemRequestAnswerDto.builder()
                 .description(requestDto.getDescription())
                 .id(id)
-                .requester(requester)
                 .build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(requester));
 
@@ -75,8 +74,7 @@ class ItemRequestServiceTest {
         // Assert
         assertThat(actual)
                 .hasFieldOrPropertyWithValue("id", expected.getId())
-                .hasFieldOrPropertyWithValue("description", expected.getDescription())
-                .hasFieldOrPropertyWithValue("requester", expected.getRequester());
+                .hasFieldOrPropertyWithValue("description", expected.getDescription());
 
         verify(itemRequestRepository, times(1)).save(Mockito.any(ItemRequest.class));
     }
@@ -108,8 +106,7 @@ class ItemRequestServiceTest {
         assertThat(actual).asList()
                 .satisfies(list -> assertThat(list.get(0))
                         .hasFieldOrPropertyWithValue("id", expected.get(0).getId())
-                        .hasFieldOrPropertyWithValue("description", expected.get(0).getDescription())
-                        .hasFieldOrPropertyWithValue("requester", expected.get(0).getRequester()));
+                        .hasFieldOrPropertyWithValue("description", expected.get(0).getDescription()));
 
         verify(itemRequestRepository, times(1)).findByRequesterIdOrderByCreatedDateDesc(anyLong());
     }
@@ -141,8 +138,7 @@ class ItemRequestServiceTest {
         assertThat(actual).asList()
                 .satisfies(list -> assertThat(list.get(0))
                         .hasFieldOrPropertyWithValue("id", expected.get(0).getId())
-                        .hasFieldOrPropertyWithValue("description", expected.get(0).getDescription())
-                        .hasFieldOrPropertyWithValue("requester", expected.get(0).getRequester()));
+                        .hasFieldOrPropertyWithValue("description", expected.get(0).getDescription()));
 
         verify(itemRequestRepository, times(1))
                 .findOthersByRequesterIdOrderByCreatedDateDesc(anyLong(), any(Pageable.class));
@@ -175,8 +171,7 @@ class ItemRequestServiceTest {
         assertThat(actual).asList()
                 .satisfies(list -> assertThat(list.get(0))
                         .hasFieldOrPropertyWithValue("id", expected.get(0).getId())
-                        .hasFieldOrPropertyWithValue("description", expected.get(0).getDescription())
-                        .hasFieldOrPropertyWithValue("requester", expected.get(0).getRequester()));
+                        .hasFieldOrPropertyWithValue("description", expected.get(0).getDescription()));
 
         verify(itemRequestRepository, times(1))
                 .findOthersByRequesterIdOrderByCreatedDateDesc(anyLong(), any(Pageable.class));
@@ -212,7 +207,6 @@ class ItemRequestServiceTest {
         when(itemRequestRepository.findById(requestId)).thenReturn(Optional.of(itemRequest));
 
         ItemRequestAnswerDto expected = ItemRequestAnswerDto.builder()
-                .requester(requester)
                 .id(requestId)
                 .description(requestDto.getDescription())
                 .build();
@@ -222,8 +216,7 @@ class ItemRequestServiceTest {
         //Assert
         assertThat(actual)
                 .hasFieldOrPropertyWithValue("id", expected.getId())
-                .hasFieldOrPropertyWithValue("description", expected.getDescription())
-                .hasFieldOrPropertyWithValue("requester", expected.getRequester());
+                .hasFieldOrPropertyWithValue("description", expected.getDescription());
 
         verify(itemRequestRepository, times(1))
                 .findById(anyLong());
