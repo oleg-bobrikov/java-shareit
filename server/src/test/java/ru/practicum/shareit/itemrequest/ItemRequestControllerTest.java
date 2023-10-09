@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.itemrequest.dto.ItemRequestAnswerDto;
 import ru.practicum.shareit.itemrequest.dto.ItemRequestRequestDto;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.util.Generator;
 
 import java.nio.charset.StandardCharsets;
@@ -112,14 +111,12 @@ class ItemRequestControllerTest {
     @SneakyThrows
     void createRequest_userExist_returnOkAndDto() {
         // Arrange
-        User requester = Generator.makeUser2();
         long userId = 1L;
         ItemRequestRequestDto requestDto = Generator.makeItemRequestRequestDto();
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestRequestDto.class)))
                 .thenAnswer(invocationOnMock -> {
                     ItemRequestRequestDto requestDto1 = invocationOnMock.getArgument(1, ItemRequestRequestDto.class);
                     return ItemRequestAnswerDto.builder()
-                            .requester(requester)
                             .id(1L)
                             .created(LocalDateTime.now())
                             .description(requestDto1.getDescription())
