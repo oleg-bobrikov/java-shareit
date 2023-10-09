@@ -6,6 +6,8 @@ import ru.practicum.shareit.item.dto.*;
 
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constant.USER_ID_HEADER;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -14,34 +16,34 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemAnswerDto createItem(@RequestHeader("X-Sharer-User-Id") long ownerId,
+    public ItemAnswerDto createItem(@RequestHeader(USER_ID_HEADER) long ownerId,
                                     @RequestBody ItemRequestDto itemDto) {
         return itemService.createItem(ownerId, itemDto);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentAnswerDto createComment(@RequestHeader("X-Sharer-User-Id") long authorId,
+    public CommentAnswerDto createComment(@RequestHeader(USER_ID_HEADER) long authorId,
                                           @RequestBody CommentRequestDto commentDto,
                                           @PathVariable long itemId) {
         return itemService.createComment(authorId, commentDto, itemId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemAnswerDto updateItem(@RequestHeader("X-Sharer-User-Id") long ownerId,
+    public ItemAnswerDto updateItem(@RequestHeader(USER_ID_HEADER) long ownerId,
                                     @RequestBody ItemRequestDto requestDto,
                                     @PathVariable long itemId) {
         return itemService.updateItem(ownerId, requestDto, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemAnswerDto getItem(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemAnswerDto getItem(@RequestHeader(USER_ID_HEADER) long userId,
                                  @PathVariable long itemId) {
 
         return itemService.getItem(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemAnswerDto> getItems(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public List<ItemAnswerDto> getItems(@RequestHeader(USER_ID_HEADER) long ownerId) {
         return itemService.getItemsByOwnerId(ownerId);
     }
 

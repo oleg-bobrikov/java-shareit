@@ -65,5 +65,17 @@ public class ServerExceptionHandler {
                 .message(exception.getMessage())
                 .build();
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseError handle(Throwable exception) {
+        log.error(exception.getMessage(), exception);
+        return ResponseError.builder()
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .exception(exception.getClass().toString())
+                .message(exception.getMessage())
+                .build();
+    }
 }
 

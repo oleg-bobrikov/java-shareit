@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public UserDto getUserById(long id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("user with id " + id + " is not exist"));

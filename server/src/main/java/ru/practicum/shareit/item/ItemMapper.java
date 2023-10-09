@@ -38,9 +38,9 @@ public interface ItemMapper {
     @Mapping(target = "requestId", expression = "java(item.getItemRequest()==null?null:item.getItemRequest().getId())")
     ItemShortAnswerDto toShortDto(Item item);
 
+    ItemHeaderDto toHeaderDto(Item item);
+
     List<ItemShortAnswerDto> toShortDto(List<Item> items);
-
-
 
 
 }

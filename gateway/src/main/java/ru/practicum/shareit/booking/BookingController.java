@@ -12,10 +12,11 @@ import ru.practicum.shareit.exception.BookingStateUnknownException;
 import ru.practicum.shareit.exception.PeriodValidationException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
+
+import static ru.practicum.shareit.common.Constant.*;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -26,10 +27,12 @@ public class BookingController {
     private final BookingClient bookingClient;
 
     @GetMapping
-    public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getBookings(@RequestHeader(USER_ID_HEADER) long userId,
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                              @PositiveOrZero @RequestParam(name = "from",
+                                                      defaultValue = PAGE_DEFAULT_FROM) Integer from,
+                                              @Positive @RequestParam(name = "size",
+                                                      defaultValue = PAGE_DEFAULT_SIZE) Integer size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new BookingStateUnknownException("Unknown state: " + stateParam));
         log.info("Get bookings by user with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
@@ -37,7 +40,7 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createBooking(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> createBooking(@RequestHeader(USER_ID_HEADER) long userId,
                                                 @RequestBody @Valid BookingRequestDto requestDto) {
         log.info("Creating booking {}, userId={}", requestDto, userId);
         validatePeriod(requestDto.getStart(), requestDto.getEnd());
@@ -45,14 +48,14 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getBooking(@RequestHeader(USER_ID_HEADER) long userId,
                                              @PathVariable long bookingId) {
         log.info("Get booking {}, userId={}", bookingId, userId);
         return bookingClient.getBooking(userId, bookingId);
     }
 
     @PatchMapping(path = "/{bookingId}")
-    public ResponseEntity<Object> approveBooking(@RequestHeader("X-Sharer-User-Id") long ownerId,
+    public ResponseEntity<Object> approveBooking(@RequestHeader(USER_ID_HEADER) long ownerId,
                                                  @PathVariable long bookingId,
                                                  @RequestParam boolean approved) {
         log.info("approve booking with bookingId={}, userId={}", bookingId, ownerId);
@@ -61,10 +64,10 @@ public class BookingController {
 
     @GetMapping(path = "/owner")
     public ResponseEntity<Object> getBookingsByOwnerId(
-            @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(name = "state", required = false, defaultValue = "ALL") String stateParam,
-            @RequestParam(defaultValue = "0") @Min(0) int from,
-            @RequestParam(defaultValue = "32") @Min(1) int size) {
+            @RequestHeader(USER_ID_HEADER) long userId,
+            @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+            @RequestParam(defaultValue = "32") @Positive int size) {
 
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new BookingStateUnknownException("Unknown state: " + stateParam));

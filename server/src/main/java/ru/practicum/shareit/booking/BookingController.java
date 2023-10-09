@@ -6,6 +6,8 @@ import ru.practicum.shareit.booking.dto.*;
 
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constant.USER_ID_HEADER;
+
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -13,28 +15,28 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingAnswerDto createBooking(@RequestHeader("X-Sharer-User-Id") long bookerId,
+    public BookingAnswerDto createBooking(@RequestHeader(USER_ID_HEADER) long bookerId,
                                           @RequestBody BookingRequestDto bookingRequestDto) {
 
         return bookingService.createBooking(bookerId, bookingRequestDto);
     }
 
     @PatchMapping(path = "/{bookingId}")
-    public BookingAnswerDto patchBooking(@RequestHeader("X-Sharer-User-Id") long ownerId,
+    public BookingAnswerDto patchBooking(@RequestHeader(USER_ID_HEADER) long ownerId,
                                          @PathVariable long bookingId,
                                          @RequestParam boolean approved) {
         return bookingService.approve(ownerId, bookingId, approved);
     }
 
     @GetMapping(path = "/{bookingId}")
-    public BookingAnswerDto getBooking(@RequestHeader("X-Sharer-User-Id") long userId,
+    public BookingAnswerDto getBooking(@RequestHeader(USER_ID_HEADER) long userId,
                                        @PathVariable long bookingId) {
         return bookingService.getBooking(userId, bookingId);
     }
 
     @GetMapping(path = "/owner")
     public List<BookingAnswerDto> getBookingsByOwnerId(
-            @RequestHeader("X-Sharer-User-Id") long ownerId,
+            @RequestHeader(USER_ID_HEADER) long ownerId,
             @RequestParam BookingState state,
             @RequestParam int from,
             @RequestParam int size) {
@@ -44,7 +46,7 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingAnswerDto> getBookingsByBookerId(
-            @RequestHeader("X-Sharer-User-Id") long bookerId,
+            @RequestHeader(USER_ID_HEADER) long bookerId,
             @RequestParam BookingState state,
             @RequestParam int from,
             @RequestParam int size) {

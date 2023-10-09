@@ -8,11 +8,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-@Value
 public class ResponseError {
-    public LocalDateTime timestamp;
-    public String error;
-    public String exception;
-    public int status;
-    public String message;
+    private LocalDateTime timestamp;
+    private String error;
+    private String exception;
+    private int status;
+    private String message;
 }

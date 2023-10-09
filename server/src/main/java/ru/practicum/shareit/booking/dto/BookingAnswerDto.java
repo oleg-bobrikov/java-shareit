@@ -4,23 +4,25 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.dto.ItemHeaderDto;
+import ru.practicum.shareit.user.dto.UserHeaderDto;
 
 import java.time.LocalDateTime;
+
+import static ru.practicum.shareit.common.Constant.DATE_TIME_PATTERN;
 
 @Data
 @Builder
 public class BookingAnswerDto {
     private Long id;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime start;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime end;
 
-    private Item item;
+    private ItemHeaderDto item;
     private Status status;
-    private User booker;
+    private UserHeaderDto booker;
 }

@@ -1,10 +1,11 @@
 package ru.practicum.shareit.booking;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.booking.dto.BookingAnswerDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.util.Generator;
 
 import java.util.Collections;
@@ -14,12 +15,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BookingMapperTest {
-    private BookingMapper bookingMapper;
-
-    @BeforeEach
-    public void setUp() {
-        bookingMapper = Mappers.getMapper(BookingMapper.class);
-    }
+    private final BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    private final ItemMapper itemMapper = Mappers.getMapper((ItemMapper.class));
+    private final UserMapper userMapper = Mappers.getMapper((UserMapper.class));
 
     @Test
     void toDto_bookingIsNull_returnNull() {
@@ -38,10 +36,10 @@ class BookingMapperTest {
         assertThat(actual)
                 .hasFieldOrPropertyWithValue("id", booking.getId())
                 .hasFieldOrPropertyWithValue("status", booking.getStatus())
-                .hasFieldOrPropertyWithValue("item", booking.getItem())
-                .hasFieldOrPropertyWithValue("booker", booking.getBooker())
+                .hasFieldOrPropertyWithValue("booker", userMapper.toHeaderDto(booking.getBooker()))
                 .hasFieldOrPropertyWithValue("start", booking.getStartDate())
-                .hasFieldOrPropertyWithValue("end", booking.getEndDate());
+                .hasFieldOrPropertyWithValue("end", booking.getEndDate())
+                .hasFieldOrPropertyWithValue("item", itemMapper.toHeaderDto(booking.getItem()));
     }
 
     @Test
@@ -73,8 +71,8 @@ class BookingMapperTest {
                 .satisfies(list -> assertThat(list.get(0))
                         .hasFieldOrPropertyWithValue("id", booking.getId())
                         .hasFieldOrPropertyWithValue("status", booking.getStatus())
-                        .hasFieldOrPropertyWithValue("item", booking.getItem())
-                        .hasFieldOrPropertyWithValue("booker", booking.getBooker())
+                        .hasFieldOrPropertyWithValue("item", itemMapper.toHeaderDto(booking.getItem()))
+                        .hasFieldOrPropertyWithValue("booker", userMapper.toHeaderDto(booking.getBooker()))
                         .hasFieldOrPropertyWithValue("start", booking.getStartDate())
                         .hasFieldOrPropertyWithValue("end", booking.getEndDate()));
     }

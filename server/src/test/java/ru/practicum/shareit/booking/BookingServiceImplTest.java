@@ -14,8 +14,10 @@ import ru.practicum.shareit.exception.NotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.util.Generator;
 
@@ -33,6 +35,8 @@ import static org.mockito.Mockito.*;
 class BookingServiceImplTest {
     private BookingService bookingService;
     private final BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    private final ItemMapper itemMapper = Mappers.getMapper(ItemMapper.class);
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @Mock
     private BookingRepository bookingRepository;
     @Mock
@@ -101,9 +105,9 @@ class BookingServiceImplTest {
                 .id(1L)
                 .start(bookingRequestDto.getStart())
                 .end(bookingRequestDto.getEnd())
-                .item(item)
+                .item(itemMapper.toHeaderDto(item))
                 .status(Status.WAITING)
-                .booker(booker)
+                .booker(userMapper.toHeaderDto(booker))
                 .build();
 
         // Act
