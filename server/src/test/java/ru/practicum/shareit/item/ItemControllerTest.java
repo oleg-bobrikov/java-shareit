@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ru.practicum.shareit.common.Constant.USER_ID_HEADER;
 
 @ExtendWith(MockitoExtension.class)
 class ItemControllerTest {
@@ -67,7 +68,7 @@ class ItemControllerTest {
 
         // act and assert
         mvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .content(mapper.writeValueAsString(request))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +104,7 @@ class ItemControllerTest {
 
         // act and assert
         mvc.perform(post("/items/{itemId}/comment", itemId)
-                        .header("X-Sharer-User-Id", authorId)
+                        .header(USER_ID_HEADER, authorId)
                         .content(mapper.writeValueAsString(request))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -129,7 +130,7 @@ class ItemControllerTest {
 
         // act and assert
         mvc.perform(get("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -155,7 +156,7 @@ class ItemControllerTest {
 
         // act and assert
         mvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -196,7 +197,7 @@ class ItemControllerTest {
 
         // act and assert
         mvc.perform(patch("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", ownerId)
+                        .header(USER_ID_HEADER, ownerId)
                         .content(mapper.writeValueAsString(patch))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -231,7 +232,7 @@ class ItemControllerTest {
 
         // act and assert
         mvc.perform(get("/items/search?text={searchText}", searchText)
-                        .header("X-Sharer-User-Id", ownerId)
+                        .header(USER_ID_HEADER, ownerId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

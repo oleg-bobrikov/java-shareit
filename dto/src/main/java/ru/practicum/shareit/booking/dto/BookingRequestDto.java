@@ -8,6 +8,8 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+import static ru.practicum.shareit.common.Constant.DATE_TIME_PATTERN;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,11 +20,11 @@ public class BookingRequestDto {
 
     @NotNull
     @FutureOrPresent
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime start;
 
     @NotNull
     @Future
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime end;
 }

@@ -62,12 +62,14 @@ public class BookingServiceImplIntegrationTest {
 
         // Assert
         assertThat(createdBooking).isPresent()
-                .satisfies(booking -> assertThat(booking.get())
+                .satisfies(bookingOptional -> assertThat(bookingOptional.get())
                         .hasFieldOrPropertyWithValue("id", actual.getId())
-                        .hasFieldOrPropertyWithValue("item", actual.getItem())
-                        .hasFieldOrPropertyWithValue("status", actual.getStatus())
-                        .hasFieldOrPropertyWithValue("booker", actual.getBooker()));
-
+                        .hasFieldOrPropertyWithValue("status", actual.getStatus()))
+                .satisfies(booking -> assertThat(booking.get().getItem())
+                        .hasFieldOrPropertyWithValue("id", actual.getItem().getId())
+                        .hasFieldOrPropertyWithValue("name", actual.getItem().getName()))
+                .satisfies(booking -> assertThat(booking.get().getBooker())
+                        .hasFieldOrPropertyWithValue("id", actual.getBooker().getId()));
     }
 }
 

@@ -11,6 +11,8 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constant.DATE_TIME_PATTERN;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class ItemRequestAnswerDto {
     private String description;
     private User requester;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime created;
     private List<ItemShortAnswerDto> items;
 }

@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -12,7 +13,9 @@ import ru.practicum.shareit.booking.dto.BookingAnswerDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.util.Generator;
 
 import java.nio.charset.StandardCharsets;
@@ -22,6 +25,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ru.practicum.shareit.common.Constant.USER_ID_HEADER;
 
 @WebMvcTest(controllers = BookingController.class)
 class BookingControllerTest {
@@ -34,6 +38,9 @@ class BookingControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    private final ItemMapper itemMapper = Mappers.getMapper(ItemMapper.class);
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+
     @SneakyThrows
     @Test
     void createBooking_validBookingDto_returnStatusOkAndValidJson() {
@@ -44,11 +51,11 @@ class BookingControllerTest {
         long bookerId = booker.getId();
         BookingAnswerDto expected = BookingAnswerDto.builder()
                 .id(1L)
-                .item(item)
+                .item(itemMapper.toHeaderDto(item))
                 .status(Status.WAITING)
                 .start(requestDto.getStart())
                 .end(requestDto.getEnd())
-                .booker(booker)
+                .booker(userMapper.toHeaderDto(booker))
                 .build();
 
         when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
@@ -58,15 +65,15 @@ class BookingControllerTest {
                             .id(1L)
                             .start(requestDto1.getStart())
                             .end(requestDto1.getEnd())
-                            .booker(booker)
-                            .item(item)
+                            .booker(userMapper.toHeaderDto(booker))
+                            .item(itemMapper.toHeaderDto(item))
                             .status(Status.WAITING)
                             .build();
                 });
 
         // Act and assert
         mvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", bookerId)
+                        .header(USER_ID_HEADER, bookerId)
                         .content(mapper.writeValueAsString(requestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,11 +94,11 @@ class BookingControllerTest {
         long ownerId = item.getOwner().getId();
         BookingAnswerDto expected = BookingAnswerDto.builder()
                 .id(bookingId)
-                .item(item)
+                .item(itemMapper.toHeaderDto(item))
                 .status(Status.APPROVED)
                 .start(requestDto.getStart())
                 .end(requestDto.getEnd())
-                .booker(booker)
+                .booker(userMapper.toHeaderDto(booker))
                 .build();
 
         when(bookingService.approve(anyLong(), anyLong(), anyBoolean()))
@@ -101,8 +108,8 @@ class BookingControllerTest {
                     return BookingAnswerDto.builder()
                             .id(bookingId1)
                             .status(Status.APPROVED)
-                            .booker(booker)
-                            .item(item)
+                            .booker(userMapper.toHeaderDto(booker))
+                            .item(itemMapper.toHeaderDto(item))
                             .start(requestDto.getStart())
                             .end(requestDto.getEnd())
                             .build();
@@ -110,7 +117,7 @@ class BookingControllerTest {
 
         // Act and assert
         mvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", ownerId)
+                        .header(USER_ID_HEADER, ownerId)
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(expected)));
@@ -128,11 +135,11 @@ class BookingControllerTest {
         long ownerId = item.getOwner().getId();
         BookingAnswerDto expected = BookingAnswerDto.builder()
                 .id(bookingId)
-                .item(item)
+                .item(itemMapper.toHeaderDto(item))
                 .status(Status.APPROVED)
                 .start(requestDto.getStart())
                 .end(requestDto.getEnd())
-                .booker(booker)
+                .booker(userMapper.toHeaderDto(booker))
                 .build();
 
         when(bookingService.getBooking(anyLong(), anyLong()))
@@ -142,8 +149,8 @@ class BookingControllerTest {
                     return BookingAnswerDto.builder()
                             .id(bookingId1)
                             .status(Status.APPROVED)
-                            .booker(booker)
-                            .item(item)
+                            .booker(userMapper.toHeaderDto(booker))
+                            .item(itemMapper.toHeaderDto(item))
                             .start(requestDto.getStart())
                             .end(requestDto.getEnd())
                             .build();
@@ -151,7 +158,7 @@ class BookingControllerTest {
 
         // Act and assert
         mvc.perform(get("/bookings/{bookingId}", bookingId)
-                        .header("X-Sharer-User-Id", ownerId)
+                        .header(USER_ID_HEADER, ownerId)
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(expected)));
@@ -169,26 +176,26 @@ class BookingControllerTest {
         long ownerId = item.getOwner().getId();
         List<BookingAnswerDto> expected = Collections.singletonList(BookingAnswerDto.builder()
                 .id(bookingId)
-                .item(item)
+                .item(itemMapper.toHeaderDto(item))
                 .status(Status.APPROVED)
                 .start(requestDto.getStart())
                 .end(requestDto.getEnd())
-                .booker(booker)
+                .booker(userMapper.toHeaderDto(booker))
                 .build());
 
         when(bookingService.getBookingsByOwnerId(anyLong(), any(BookingState.class), anyInt(), anyInt()))
                 .thenReturn(Collections.singletonList(BookingAnswerDto.builder()
                         .id(bookingId)
                         .status(Status.APPROVED)
-                        .booker(booker)
-                        .item(item)
+                        .booker(userMapper.toHeaderDto(booker))
+                        .item(itemMapper.toHeaderDto(item))
                         .start(requestDto.getStart())
                         .end(requestDto.getEnd())
                         .build()));
 
         // Act and assert
         mvc.perform(get("/bookings/owner?state={state}&from={from}&size={size}", "ALL", 0, 32)
-                        .header("X-Sharer-User-Id", ownerId)
+                        .header(USER_ID_HEADER, ownerId)
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(expected)));
@@ -205,26 +212,26 @@ class BookingControllerTest {
         long bookingId = 1L;
         List<BookingAnswerDto> expected = Collections.singletonList(BookingAnswerDto.builder()
                 .id(bookingId)
-                .item(item)
+                .item(itemMapper.toHeaderDto(item))
                 .status(Status.APPROVED)
                 .start(requestDto.getStart())
                 .end(requestDto.getEnd())
-                .booker(booker)
+                .booker(userMapper.toHeaderDto(booker))
                 .build());
 
         when(bookingService.getBookingsByBookerId(anyLong(), any(BookingState.class), anyInt(), anyInt()))
                 .thenReturn(Collections.singletonList(BookingAnswerDto.builder()
                         .id(bookingId)
                         .status(Status.APPROVED)
-                        .booker(booker)
-                        .item(item)
+                        .booker(userMapper.toHeaderDto(booker))
+                        .item(itemMapper.toHeaderDto(item))
                         .start(requestDto.getStart())
                         .end(requestDto.getEnd())
                         .build()));
 
         // Act and assert
         mvc.perform(get("/bookings?state={state}&from={from}&size={size}", "ALL", 0, 32)
-                        .header("X-Sharer-User-Id", bookerId)
+                        .header(USER_ID_HEADER, bookerId)
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(expected)));
